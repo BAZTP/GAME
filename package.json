@@ -1,0 +1,22 @@
+{
+  "name": "marea-negra",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Una aventura naval entre dos mundos, completamente en español.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "npm run build && node tests/browser.smoke.mjs",
+    "check": "node --check src/game.js && node --check src/render.js && node --check src/main.js && node --check server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright": "1.64.0"
+  }
+}

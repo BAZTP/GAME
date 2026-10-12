@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101f27" />
+    <meta
+      name="description"
+      content="Surca un archipiélago perdido, cruza al mar espectral y recupera tres reliquias en Marea Negra, una aventura pirata original."
+    />
+    <title>Marea Negra — Ecos del Abismo</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <svg
+      class="svg-library"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <defs>
+        <symbol id="i-compass" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="m16 8-2 6-6 2 2-6 6-2Z" />
+          <path d="M12 1v2m0 18v2M1 12h2m18 0h2" />
+        </symbol>
+        <symbol id="i-map" viewBox="0 0 24 24">
+          <path d="m3 5 6-2 6 3 6-2v15l-6 2-6-3-6 2V5Zm6-2v15m6-12v15" />
+        </symbol>
+        <symbol id="i-book" viewBox="0 0 24 24">
+          <path
+            d="M5 3h15v18H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 0v14h15M9 7h7m-7 4h5"
+          />
+        </symbol>
+        <symbol id="i-anchor" viewBox="0 0 24 24">
+          <circle cx="12" cy="5" r="3" />
+          <path
+            d="M12 8v13M7 11h10M3 15l1 4 8 3 8-3 1-4M1 16l2-2 3 2m12 0 3-2 2 2"
+          />
+        </symbol>
+        <symbol id="i-sail" viewBox="0 0 24 24">
+          <path d="M12 2v16H3L12 2Zm3 4 6 12h-6V6ZM2 21h20" />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24">
+          <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+        </symbol>
+        <symbol id="i-cross" viewBox="0 0 24 24">
+          <path d="m5 5 14 14M5 19 19 5" />
+        </symbol>
+        <symbol id="i-sound" viewBox="0 0 24 24">
+          <path
+            d="M3 9h4l5-5v16l-5-5H3V9Zm13-2a7 7 0 0 1 0 10m3-13a11 11 0 0 1 0 16"
+          />
+        </symbol>
+      </defs>
+    </svg>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Marea Negra, inicio"
+        ><span class="brand-mark"
+          ><svg><use href="#i-compass" /></svg></span
+        ><span>MAREA NEGRA<small>ECOS DEL ABISMO</small></span></a
+      >
+      <nav aria-label="Navegación principal">
+        <button class="nav-link active" id="voyage-btn">
+          <svg><use href="#i-compass" /></svg><span>Travesía</span></button
+        ><button class="nav-link" id="map-btn">
+          <svg><use href="#i-map" /></svg><span>Carta náutica</span
+          ><kbd>M</kbd></button
+        ><button class="nav-link" id="log-btn">
+          <svg><use href="#i-book" /></svg><span>Bitácora</span>
+        </button>
+      </nav>
+      <div class="header-end">
+        <span class="save-status" id="save-status"><i></i> Guardado local</span
+        ><button
+          class="icon-btn"
+          id="sound-btn"
+          aria-label="Activar sonido"
+          title="Activar sonido"
+          aria-pressed="false"
+        >
+          <svg><use href="#i-sound" /></svg
+          ><span class="sound-off">/</span></button
+        ><button
+          class="icon-btn help-btn"
+          id="help-btn"
+          aria-label="Cómo jugar"
+        >
+          ?
+        </button>
+      </div>
+    </header>
+    <main class="dashboard">
+      <aside class="sidebar">
+        <section class="voyage-heading">
+          <span class="eyebrow">TU PRÓXIMA GRAN HISTORIA</span>
+          <h1>Donde acaba<br />el mapa.</h1>
+          <p>El mar guarda sus secretos.<br />Haz que te los cuente.</p>
+          <div class="edition">
+            <span>ARCHIPIÉLAGO DE LAS ÁNIMAS</span><span>01 — 08</span>
+          </div>
+        </section>
+        <section class="quest-panel">
+          <div class="section-title">
+            <h2>LA TRAVESÍA</h2>
+            <span id="quest-count">0 / 3</span>
+          </div>
+          <div class="quest-main">
+            <span class="quest-icon">✧</span>
+            <div>
+              <h3>El corazón del abismo</h3>
+              <p>Reúne las tres reliquias y despierta al guardián del mar.</p>
+            </div>
+          </div>
+          <ol class="quest-list" id="quest-list">
+            <li data-relic="sun">
+              <span class="quest-dot"></span>
+              <div>El oro del sol<small>Isla del Sol · mundo real</small></div>
+              <span class="relic-glyph">☀</span>
+            </li>
+            <li data-relic="moon">
+              <span class="quest-dot"></span>
+              <div>
+                La lágrima de luna<small>Velo de Luna · mar espectral</small>
+              </div>
+              <span class="relic-glyph">☾</span>
+            </li>
+            <li data-relic="tide">
+              <span class="quest-dot"></span>
+              <div>
+                La voz de la marea<small>Colmillo Rojo · aguas hostiles</small>
+              </div>
+              <span class="relic-glyph">≋</span>
+            </li>
+          </ol>
+          <div class="quest-tip" id="quest-tip">
+            <svg><use href="#i-compass" /></svg>
+            <p>Tu brújula señala la próxima reliquia.</p>
+          </div>
+        </section>
+        <section class="ship-panel">
+          <div class="section-title">
+            <h2>TU NAVÍO</h2>
+            <span class="ship-level" id="ship-level">NIV. 1</span>
+          </div>
+          <div class="ship-name">
+            <svg><use href="#i-sail" /></svg>
+            <div>
+              <h3>La Peregrina</h3>
+              <p>Balandra de los mares libres</p>
+            </div>
+          </div>
+          <div class="hull-label">
+            <span>Integridad del casco</span
+            ><strong id="hp-label">130 / 130</strong>
+          </div>
+          <div class="meter hull-meter"><span id="hp-bar"></span></div>
+          <div class="ship-stats">
+            <div>
+              <span>◈</span><strong id="gold-label">120</strong
+              ><small>DOBLONES</small>
+            </div>
+            <div>
+              <span>⚑</span><strong id="sunk-label">0</strong
+              ><small>VICTORIAS</small>
+            </div>
+            <div>
+              <span>⌖</span><strong id="islands-label">1 / 8</strong
+              ><small>ISLAS</small>
+            </div>
+          </div>
+          <button class="port-button" id="port-btn">
+            <svg><use href="#i-anchor" /></svg> Astillero y mejoras
+            <span>↗</span>
+          </button>
+        </section>
+        <div class="sidebar-footer">
+          <span class="small-compass">✥</span>
+          <p>NO TODOS LOS TESOROS<br />ESTÁN BAJO TIERRA.</p>
+        </div>
+      </aside>
+      <section class="sea-section" aria-label="Zona de juego">
+        <div class="sea-topline">
+          <div>
+            <span class="live-dot"></span
+            ><strong id="region-label">Puerto Bruma</strong
+            ><span class="sea-divider">/</span
+            ><span id="realm-label">Mar de los vivos</span>
+          </div>
+          <span class="coordinates" id="coordinates"
+            >18° 24′ N &nbsp; 64° 45′ O</span
+          >
+        </div>
+        <div class="game-frame" id="game-frame">
+          <canvas
+            id="game"
+            tabindex="0"
+            aria-label="Juego naval. Usa WASD o las flechas para navegar, espacio para disparar, Q para cambiar de mundo y E para interactuar."
+          ></canvas>
+          <div class="world-badge">
+            <span id="world-icon">☀</span>
+            <div>
+              <strong id="world-name">MAR DE LOS VIVOS</strong
+              ><span id="world-desc">La calma nunca es para siempre</span>
+            </div>
+          </div>
+          <div class="canvas-actions">
+            <button
+              class="glass-button"
+              id="pause-btn"
+              aria-label="Pausar juego"
+              title="Pausar (Esc)"
+            >
+              II</button
+            ><button
+              class="glass-button"
+              id="fullscreen-btn"
+              aria-label="Pantalla completa"
+              title="Pantalla completa"
+            >
+              ⛶
+            </button>
+          </div>
+          <div
+            class="toast-stack"
+            id="toasts"
+            role="status"
+            aria-live="polite"
+          ></div>
+          <div class="target-pointer" id="target-pointer">
+            <span>✧</span>
+            <div id="target-text">
+              Isla del Sol<small>Próxima reliquia</small>
+            </div>
+            <b id="target-distance">940 m</b>
+          </div>
+          <button class="interact-prompt" id="interact-prompt" hidden>
+            <kbd>E</kbd><span>Explorar isla</span><b>→</b>
+          </button>
+          <div class="bottom-hud">
+            <div class="realm-control">
+              <button id="realm-btn" aria-label="Alternar mar espectral">
+                <svg><use href="#i-moon" /></svg>
+              </button>
+              <div>
+                <span>VELO ESPECTRAL <kbd>Q</kbd></span>
+                <div class="meter"><span id="energy-bar"></span></div>
+                <small id="energy-label">Listo para cruzar</small>
+              </div>
+            </div>
+            <div class="wind-indicator">
+              <svg><use href="#i-compass" /></svg>
+              <div>
+                <span>VIENTO DEL ESTE</span
+                ><strong>12 nudos <small>↗</small></strong>
+              </div>
+            </div>
+            <button
+              class="mini-map"
+              id="mini-map-btn"
+              aria-label="Abrir carta náutica"
+            >
+              <canvas id="minimap" width="160" height="112"></canvas
+              ><span>CARTA NÁUTICA <kbd>M</kbd></span>
+            </button>
+          </div>
+          <div class="touch-controls" id="touch-controls">
+            <div class="dpad">
+              <button data-move="up" aria-label="Navegar hacia arriba">↑</button
+              ><button data-move="left" aria-label="Navegar a la izquierda">
+                ←</button
+              ><button data-move="down" aria-label="Navegar hacia abajo">
+                ↓</button
+              ><button data-move="right" aria-label="Navegar a la derecha">
+                →
+              </button>
+            </div>
+            <div class="touch-actions">
+              <button id="touch-boost" aria-label="Impulso de velas">➤</button
+              ><button id="touch-fire" aria-label="Disparar cañones">⌖</button>
+            </div>
+          </div>
+          <div class="intro-overlay" id="intro-overlay">
+            <div class="intro-card">
+              <span class="eyebrow">UNA AVENTURA ENTRE DOS MUNDOS</span>
+              <div class="intro-ornament">✧</div>
+              <h2>El horizonte<br />es solo el principio.</h2>
+              <p>
+                Un mar por descubrir. Tres reliquias olvidadas.<br />Y un
+                secreto que solo los muertos conocen.
+              </p>
+              <button class="primary-button" id="start-btn">
+                Izar las velas <span>→</span></button
+              ><button class="continue-button" id="continue-btn" hidden>
+                Continuar mi travesía <span>↗</span></button
+              ><span class="intro-footnote"
+                >EXPLORA · COMBATE · CRUZA EL VELO</span
+              >
+            </div>
+            <div class="intro-caption">
+              EL ARCHIPIÉLAGO DE LAS ÁNIMAS<span
+                >Un lugar al que los mapas no se atreven a llegar.</span
+              >
+            </div>
+          </div>
+        </div>
+        <footer class="controls-bar">
+          <span><kbd>W A S D</kbd> / <kbd>↑ ← ↓ →</kbd> Navegar</span
+          ><span><kbd>ESPACIO</kbd> Cañones</span
+          ><span><kbd>SHIFT</kbd> Impulso</span
+          ><span><kbd>E</kbd> Interactuar</span
+          ><span class="controls-more"
+            ><button id="controls-help">Todos los controles ↗</button></span
+          >
+        </footer>
+        <div class="sea-bottomline">
+          <span>EXPLORAR ES OTRA FORMA DE SER LIBRE.</span
+          ><span id="session-status"
+            >Una aventura original · Sin conexión una vez cargada</span
+          >
+        </div>
+      </section>
+    </main>
+    <dialog id="modal" aria-labelledby="modal-title">
+      <div class="modal-heading">
+        <div>
+          <span class="eyebrow" id="modal-eyebrow">MAREA NEGRA</span>
+          <h2 id="modal-title"></h2>
+        </div>
+        <button class="icon-btn" id="close-modal" aria-label="Cerrar ventana">
+          <svg><use href="#i-cross" /></svg>
+        </button>
+      </div>
+      <div id="modal-body"></div>
+    </dialog>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

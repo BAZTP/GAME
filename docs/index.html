@@ -1,0 +1,2045 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101f27" />
+    <meta
+      name="description"
+      content="Surca un archipiélago perdido, cruza al mar espectral y recupera tres reliquias en Marea Negra, una aventura pirata original."
+    />
+    <title>Marea Negra — Ecos del Abismo</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%23132a32%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%23d4b67b%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22m44%2020-7%2017-17%207%207-17Z%22%20fill%3D%22%23d4b67b%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%223%22%20fill%3D%22%23132a32%22%2F%3E%3C%2Fsvg%3E%0A" />
+    <style>:root {
+  --ink: #1c3034;
+  --muted: #7a8179;
+  --paper: #f5f3eb;
+  --gold: #c0a16b;
+  --line: #dedfd5;
+  --teal: #1d5554;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: Arial, Helvetica, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+button:focus-visible,
+a:focus-visible,
+canvas:focus-visible {
+  outline: 3px solid #c89d51;
+  outline-offset: 4px;
+}
+button {
+  color: inherit;
+}
+svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.svg-library {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+[hidden] {
+  display: none !important;
+}
+.topbar {
+  height: 95px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  gap: 24px;
+}
+.brand {
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-size: 23px;
+  letter-spacing: 2.2px;
+  font-weight: 600;
+}
+.brand small {
+  display: block;
+  font: 9px var(--sans);
+  letter-spacing: 4px;
+  margin-top: 8px;
+}
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+}
+.brand-mark svg {
+  width: 46px;
+  height: 46px;
+  stroke-width: 1;
+}
+.topbar nav {
+  height: 100%;
+  display: flex;
+  gap: 30px;
+}
+.nav-link {
+  border: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  position: relative;
+  font-size: 12px;
+  color: #777f77;
+  white-space: nowrap;
+}
+.nav-link.active {
+  color: var(--teal);
+}
+.nav-link.active:after {
+  position: absolute;
+  content: "";
+  height: 3px;
+  background: var(--teal);
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.nav-link svg {
+  width: 17px;
+}
+.nav-link kbd {
+  margin-left: 4px;
+  color: #8b9187;
+}
+.header-end {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+.save-status {
+  font-size: 10px;
+  color: #7c837a;
+  white-space: nowrap;
+}
+.save-status i,
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #688e73;
+  border-radius: 50%;
+  margin-right: 7px;
+}
+.icon-btn {
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  height: 33px;
+  width: 33px;
+  background: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.help-btn {
+  font-family: var(--serif);
+  font-size: 17px;
+}
+.sound-off {
+  position: absolute;
+  font-size: 24px;
+  transform: rotate(10deg);
+  color: #85775e;
+  text-shadow: 1px 0 var(--paper);
+}
+.dashboard {
+  max-width: 1900px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr);
+  padding: 32px 40px 22px;
+  gap: 34px;
+}
+.sidebar {
+  border-right: 1px solid var(--line);
+  padding-right: 29px;
+}
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color: #7a8275;
+}
+.voyage-heading h1 {
+  font-family: var(--serif);
+  font-size: 41px;
+  line-height: 1.08;
+  font-weight: 400;
+  letter-spacing: -1.3px;
+  margin: 19px 0 13px;
+}
+.voyage-heading p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #818579;
+  margin: 0;
+}
+.edition {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  letter-spacing: 0.8px;
+  color: #8b9184;
+  margin: 25px 0 26px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 20px;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-title h2 {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  margin: 0;
+  font-weight: 600;
+}
+.section-title > span {
+  font-size: 10px;
+  color: #8a9085;
+}
+.quest-main {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.quest-icon {
+  color: var(--gold);
+  font-size: 30px;
+  line-height: 30px;
+}
+.quest-main h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.quest-main p {
+  color: #8a8d81;
+  font-size: 11px;
+  line-height: 1.8;
+  margin: 0;
+}
+.quest-list {
+  padding: 0;
+  list-style: none;
+  margin: 23px 0;
+}
+.quest-list li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 21px;
+  font-size: 11px;
+}
+.quest-list small {
+  display: block;
+  color: #929487;
+  font-size: 9px;
+  margin-top: 6px;
+}
+.quest-dot {
+  width: 11px;
+  height: 11px;
+  border: 1px solid #c5c9bb;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.quest-list .done .quest-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: inset 0 0 0 2px var(--paper);
+}
+.quest-list .done {
+  color: var(--teal);
+}
+.relic-glyph {
+  margin-left: auto;
+  font-size: 21px;
+  color: #acac94;
+}
+.quest-tip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #e9ede4;
+  padding: 10px 11px;
+  border-radius: 3px;
+}
+.quest-tip svg {
+  flex-shrink: 0;
+  width: 18px;
+  color: #6b8573;
+}
+.quest-tip p {
+  font-size: 10px;
+  line-height: 1.7;
+  margin: 0;
+  color: #748173;
+}
+.ship-panel {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin-top: 26px;
+}
+.ship-level {
+  font-size: 8px !important;
+  background: #e9e9de;
+  padding: 4px 7px;
+  letter-spacing: 0.7px;
+}
+.ship-name {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 20px 0;
+}
+.ship-name svg {
+  height: 35px;
+  width: 35px;
+  stroke-width: 1;
+}
+.ship-name h3 {
+  font-family: var(--serif);
+  font-size: 23px;
+  font-weight: 400;
+  margin: 0 0 5px;
+}
+.ship-name p {
+  font-size: 9px;
+  color: #999b8c;
+  margin: 0;
+}
+.hull-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #828b7c;
+  margin-bottom: 8px;
+}
+.hull-label strong {
+  font-size: 9px;
+  color: #647465;
+  font-weight: 400;
+}
+.meter {
+  height: 4px;
+  background: #e0e5d8;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.meter span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #688d75;
+  transition: width 0.15s;
+}
+.ship-stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 22px 0;
+}
+.ship-stats > div {
+  display: grid;
+  grid-template-columns: 15px auto;
+  gap: 5px 5px;
+  align-items: center;
+}
+.ship-stats > div > span {
+  color: var(--gold);
+  font-size: 15px;
+}
+.ship-stats strong {
+  font-size: 16px;
+  font-weight: 400;
+  font-family: var(--serif);
+}
+.ship-stats small {
+  grid-column: 1/3;
+  font-size: 7px;
+  letter-spacing: 0.8px;
+  color: #989c8c;
+  margin-top: 3px;
+}
+.port-button {
+  background: none;
+  border: 1px solid #cdd2c2;
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 3px;
+}
+.port-button:hover {
+  background: #e9ede4;
+}
+.port-button svg {
+  width: 15px;
+  height: 15px;
+}
+.port-button span {
+  margin-left: auto;
+}
+.sidebar-footer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 25px;
+  color: #a5a996;
+}
+.small-compass {
+  font-size: 32px;
+}
+.sidebar-footer p {
+  font-size: 7px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+}
+.sea-section {
+  min-width: 0;
+}
+.sea-topline {
+  height: 31px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 10px;
+  gap: 10px;
+  color: #82897d;
+}
+.sea-topline strong {
+  font-weight: 500;
+  color: #546357;
+}
+.sea-divider {
+  margin: 0 12px;
+  color: #b8bcae;
+}
+.coordinates {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+}
+.game-frame {
+  height: calc(100dvh - 213px);
+  min-height: 560px;
+  max-height: 1100px;
+  position: relative;
+  overflow: hidden;
+  background: #214c53;
+  border-radius: 6px;
+  isolation: isolate;
+  border: 1px solid #bcc7b4;
+  box-shadow: 0 8px 30px #142c3010;
+}
+.game-frame:fullscreen {
+  height: 100dvh;
+  max-height: none;
+  width: 100vw;
+  border-radius: 0;
+}
+.game-frame #game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline-offset: -4px;
+}
+.world-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #eee8ca;
+  pointer-events: none;
+}
+.world-badge > span {
+  font-size: 29px;
+  line-height: 1;
+  color: #e0ca93;
+}
+.world-badge strong {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1.7px;
+  font-weight: 500;
+}
+.world-badge div > span {
+  display: block;
+  font-family: var(--serif);
+  font-size: 12px;
+  color: #d4ddc5b0;
+  margin-top: 6px;
+  font-style: italic;
+}
+.canvas-actions {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+}
+.glass-button {
+  display: grid;
+  place-items: center;
+  background: #102e3750;
+  border: 1px solid #d7e6d030;
+  color: #e5ead3;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  font-size: 18px;
+  backdrop-filter: blur(8px);
+}
+.glass-button:hover {
+  background: #102e37b0;
+}
+.target-pointer {
+  position: absolute;
+  top: 90px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e9e4c7;
+  background: #112e3770;
+  padding: 10px 12px;
+  border: 1px solid #bbceb823;
+  border-radius: 4px;
+  pointer-events: none;
+  backdrop-filter: blur(5px);
+}
+.target-pointer > span {
+  font-size: 25px;
+  color: #dbbf7c;
+}
+.target-pointer div {
+  font-family: var(--serif);
+  font-size: 14px;
+}
+.target-pointer small {
+  display: block;
+  font-family: var(--sans);
+  font-size: 8px;
+  margin-top: 4px;
+  color: #afc6b9;
+}
+.target-pointer b {
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 400;
+  margin-left: 14px;
+  color: #becbb6;
+}
+.bottom-hud {
+  position: absolute;
+  bottom: 22px;
+  left: 24px;
+  right: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  pointer-events: none;
+}
+.realm-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+.realm-control > button {
+  border: 1px solid #bbd3c448;
+  background: #10323e90;
+  border-radius: 50%;
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  color: #d5e0ca;
+  backdrop-filter: blur(5px);
+}
+.realm-control > button:hover {
+  background: #6a6289;
+}
+.realm-control > div {
+  width: 135px;
+}
+.realm-control > div > span {
+  color: #ceddca;
+  font-size: 8px;
+  letter-spacing: 1.3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.realm-control .meter {
+  margin: 8px 0 6px;
+  background: #9ab0a330;
+}
+.realm-control .meter span {
+  background: #b1cfb3;
+}
+.realm-control small {
+  font-size: 9px;
+  color: #b0c6b7;
+}
+.realm-control kbd {
+  background: #afcbb215;
+  border-color: #afcbb230;
+  color: #dce5cd;
+  font-size: 8px;
+}
+.wind-indicator {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #d5dfc6;
+  padding-bottom: 8px;
+}
+.wind-indicator > svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1;
+}
+.wind-indicator span {
+  font-size: 7px;
+  letter-spacing: 1.2px;
+}
+.wind-indicator strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 400;
+  margin-top: 6px;
+}
+.wind-indicator small {
+  font-size: 21px;
+  margin-left: 10px;
+}
+.mini-map {
+  width: 142px;
+  padding: 5px;
+  border: 1px solid #dfd5ad70;
+  border-radius: 3px;
+  background: #ddd1a8;
+  box-shadow: 0 4px 14px #102e3340;
+  transform: rotate(2deg);
+  pointer-events: auto;
+  color: #536252;
+}
+.mini-map canvas {
+  width: 130px;
+  height: 86px;
+  display: block;
+}
+.mini-map > span {
+  font-size: 7px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px 0;
+}
+.mini-map kbd {
+  font-size: 7px;
+  border-color: #7c85634a;
+  padding: 1px 3px;
+}
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 9px;
+  color: #7e897b;
+  flex-wrap: wrap;
+}
+.controls-bar > span {
+  white-space: nowrap;
+}
+kbd {
+  font: 8px var(--sans);
+  border: 1px solid #d4d8ca;
+  padding: 4px 5px;
+  border-radius: 3px;
+  background: #ecede4;
+  color: #5c6b5d;
+  white-space: nowrap;
+}
+.controls-bar kbd {
+  margin-right: 5px;
+  font-size: 7px;
+}
+.controls-more {
+  margin-left: auto;
+}
+.controls-more button {
+  border: 0;
+  background: none;
+  font-size: 9px;
+  color: #70806f;
+  padding: 0;
+}
+.sea-bottomline {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-size: 7px;
+  letter-spacing: 1.3px;
+  color: #949b8c;
+}
+.sea-bottomline > span:last-child {
+  font-size: 8px;
+  letter-spacing: 0.2px;
+}
+.intro-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #102b36b3, #163e4520 80%);
+  display: flex;
+  align-items: center;
+  padding: 5%;
+  z-index: 4;
+}
+.intro-card {
+  width: 440px;
+  max-width: 100%;
+  color: #f3efdc;
+  background: #102d37db;
+  border: 1px solid #bfc3a740;
+  padding: 37px 35px 28px;
+  box-shadow: 0 12px 80px #001c3040;
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+}
+.intro-card .eyebrow {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #c4b286;
+}
+.intro-ornament {
+  font-size: 36px;
+  color: #c8b785;
+  margin: 20px 0 11px;
+}
+.intro-card h2 {
+  font-family: var(--serif);
+  font-size: 43px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin: 0 0 20px;
+}
+.intro-card p {
+  font-size: 11px;
+  color: #b9c8bc;
+  line-height: 1.9;
+  margin: 0 0 28px;
+}
+.primary-button {
+  background: #d9bd83;
+  border: 1px solid #dfc58e;
+  padding: 14px 18px;
+  border-radius: 3px;
+  color: #1c3439;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.primary-button:hover {
+  background: #e7cc98;
+  transform: translateY(-1px);
+}
+.primary-button > span {
+  font-size: 20px;
+  font-weight: 400;
+}
+.intro-footnote {
+  display: block;
+  text-align: center;
+  font-size: 7px;
+  letter-spacing: 2px;
+  margin-top: 21px;
+  color: #849f96;
+}
+.continue-button {
+  background: none;
+  border: 1px solid #c4cba855;
+  color: #d6dfc9;
+  padding: 12px;
+  width: 100%;
+  border-radius: 3px;
+  margin-top: 10px;
+  font-size: 11px;
+}
+.intro-caption {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #e0e3c6;
+  font-size: 8px;
+  letter-spacing: 2px;
+  width: 90%;
+  pointer-events: none;
+}
+.intro-caption span {
+  display: block;
+  font-family: var(--serif);
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: 0;
+  color: #b6cbbb;
+  margin-top: 7px;
+}
+.interact-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 158px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f1e7cdef;
+  border: 1px solid #ecddb0;
+  box-shadow: 0 5px 20px #0c293350;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.interact-prompt kbd {
+  background: #cfc7ab50;
+  border-color: #a5ac91;
+  font-size: 10px;
+}
+.interact-prompt b {
+  font-size: 16px;
+  color: #8a9774;
+}
+.toast-stack {
+  position: absolute;
+  top: 77px;
+  left: 24px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  pointer-events: none;
+  z-index: 5;
+}
+.toast {
+  background: #14383aef;
+  color: #eee5c5;
+  padding: 11px 14px;
+  border: 1px solid #c0cfa53a;
+  border-left: 2px solid #d2b97c;
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1.5;
+  animation: toast-in 0.3s ease-out;
+}
+.toast.danger {
+  border-left-color: #df8d75;
+}
+.toast.success {
+  border-left-color: #8bcca0;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+dialog {
+  border: 1px solid #d6d5bd;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 30px;
+  width: min(610px, calc(100vw - 32px));
+  max-height: 90dvh;
+  box-shadow: 0 25px 100px #001b3c70;
+}
+dialog::backdrop {
+  background: #102a35a8;
+  backdrop-filter: blur(5px);
+}
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 23px;
+}
+.modal-heading h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 32px;
+  margin: 9px 0 0;
+}
+.modal-heading .icon-btn {
+  flex-shrink: 0;
+}
+#modal-body {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #6f7c6e;
+}
+#modal-body p:first-child {
+  margin-top: 0;
+}
+.modal-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  min-height: 125px;
+  background: #e7eadd;
+  border-radius: 4px;
+  color: #a79056;
+  margin-bottom: 24px;
+}
+.modal-art.spectral {
+  background: #e6e2eb;
+  color: #897b9e;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+.secondary-button {
+  padding: 12px 18px;
+  border: 1px solid #bbc5b4;
+  background: transparent;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.secondary-button:hover {
+  background: #e4e9dc;
+}
+.modal-actions .primary-button {
+  font-size: 11px;
+}
+.control-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+.control-grid > div {
+  padding: 11px;
+  background: #e8ecdf;
+  font-size: 11px;
+  border-radius: 3px;
+}
+.control-grid kbd {
+  display: inline-block;
+  min-width: 40px;
+  text-align: center;
+  margin-right: 8px;
+}
+.modal-note {
+  padding: 12px 15px;
+  border-left: 2px solid var(--gold);
+  background: #ececde;
+  font-size: 11px;
+}
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.upgrade-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  padding: 14px;
+  border-radius: 4px;
+}
+.upgrade-item h3 {
+  font-family: var(--serif);
+  font-size: 20px;
+  margin: 0 0 4px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.upgrade-item p {
+  font-size: 11px;
+  margin: 0 !important;
+}
+.upgrade-item button {
+  flex-shrink: 0;
+  background: #dee5d5;
+  border: 1px solid #becdb4;
+  font-size: 10px;
+  padding: 10px 13px;
+  border-radius: 3px;
+  min-width: 90px;
+}
+.upgrade-item button:hover:enabled {
+  background: #c8d8bd;
+}
+.port-balance {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+  margin-bottom: 17px;
+}
+.port-balance strong {
+  color: #937b44;
+}
+.journal-entry {
+  display: flex;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  padding: 13px 0;
+  font-size: 12px;
+}
+.journal-entry > span {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #9a9f8c;
+  flex-shrink: 0;
+}
+.journal-entry p {
+  margin: 0 !important;
+}
+.big-map {
+  display: block;
+  width: 100%;
+  border: 1px solid #c6c4a4;
+  border-radius: 4px;
+  background: #e0d7b7;
+}
+.map-legend {
+  display: flex;
+  gap: 17px;
+  flex-wrap: wrap;
+  font-size: 10px;
+  margin-top: 13px;
+}
+.map-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.map-help {
+  font-size: 11px;
+  margin-top: 12px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+.summary-grid div {
+  text-align: center;
+  background: #e8ebdf;
+  padding: 15px 6px;
+  border-radius: 3px;
+}
+.summary-grid strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 26px;
+  color: var(--ink);
+}
+.summary-grid span {
+  font-size: 9px;
+}
+.touch-controls {
+  display: none;
+}
+.text-danger {
+  color: #a35b4d;
+}
+.pause-copy {
+  text-align: center;
+  padding: 10px 0 25px;
+}
+.pause-copy .modal-art {
+  font-size: 58px;
+}
+#modal.map-dialog {
+  width: min(850px, calc(100vw - 28px));
+}
+@media (min-width: 1650px) {
+  .dashboard {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 45px;
+    padding-top: 36px;
+  }
+  .sidebar {
+    padding-right: 35px;
+  }
+  .voyage-heading h1 {
+    font-size: 46px;
+  }
+  .quest-main h3 {
+    font-size: 20px;
+  }
+  .quest-list li {
+    font-size: 12px;
+  }
+  .quest-list small {
+    font-size: 10px;
+  }
+  .intro-card {
+    width: 470px;
+    padding: 40px;
+  }
+  .intro-card h2 {
+    font-size: 48px;
+  }
+}
+@media (max-width: 1180px) {
+  .topbar {
+    padding: 0 24px;
+    gap: 16px;
+  }
+  .brand {
+    font-size: 19px;
+    gap: 9px;
+  }
+  .brand small {
+    font-size: 8px;
+    letter-spacing: 3px;
+  }
+  .brand-mark,
+  .brand-mark svg {
+    width: 36px;
+    height: 36px;
+  }
+  .topbar nav {
+    gap: 18px;
+  }
+  .save-status {
+    display: none;
+  }
+  .dashboard {
+    padding: 25px 24px 20px;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .sidebar {
+    padding-right: 23px;
+  }
+  .voyage-heading h1 {
+    font-size: 36px;
+  }
+  .quest-main h3 {
+    font-size: 16px;
+  }
+  .edition {
+    font-size: 6px;
+  }
+  .controls-bar {
+    gap: 12px;
+  }
+  .controls-more {
+    display: none;
+  }
+  .wind-indicator {
+    display: none;
+  }
+  .sea-bottomline > span:first-child {
+    display: none;
+  }
+  .sea-bottomline {
+    justify-content: flex-end;
+  }
+  .game-frame {
+    height: calc(100dvh - 202px);
+  }
+  .intro-card {
+    padding: 28px;
+    width: 380px;
+  }
+  .intro-card h2 {
+    font-size: 39px;
+  }
+  .coordinates {
+    font-size: 8px;
+  }
+  .realm-control > div {
+    width: 115px;
+  }
+}
+@media (max-width: 850px) {
+  .topbar {
+    height: 78px;
+    padding: 0 18px;
+  }
+  .topbar nav {
+    gap: 16px;
+  }
+  .nav-link {
+    font-size: 11px;
+  }
+  .nav-link kbd {
+    display: none;
+  }
+  .header-end {
+    gap: 8px;
+  }
+  .brand {
+    font-size: 17px;
+    letter-spacing: 1.5px;
+  }
+  .brand small {
+    font-size: 7px;
+    letter-spacing: 2.5px;
+  }
+  .brand-mark,
+  .brand-mark svg {
+    width: 31px;
+    height: 31px;
+  }
+  .dashboard {
+    display: flex;
+    flex-direction: column;
+    padding: 19px 18px;
+    gap: 25px;
+  }
+  .sidebar {
+    order: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-right: 0;
+    padding-right: 0;
+    gap: 25px;
+  }
+  .voyage-heading {
+    display: none;
+  }
+  .ship-panel {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .sidebar-footer {
+    display: none;
+  }
+  .quest-main {
+    margin-top: 15px;
+  }
+  .quest-list {
+    margin: 17px 0;
+  }
+  .quest-list li {
+    margin-bottom: 15px;
+  }
+  .game-frame {
+    height: calc(100dvh - 195px);
+    min-height: 470px;
+    max-height: 950px;
+  }
+  .sea-topline {
+    height: 27px;
+  }
+  .sea-bottomline {
+    display: none;
+  }
+  .controls-bar {
+    justify-content: center;
+    font-size: 8px;
+  }
+  .intro-overlay {
+    padding: 30px;
+  }
+  .intro-card {
+    width: 390px;
+  }
+  .target-pointer {
+    top: 78px;
+    right: 18px;
+  }
+  .toast-stack {
+    left: 18px;
+    max-width: 230px;
+  }
+  .world-badge {
+    left: 18px;
+    top: 20px;
+  }
+  .bottom-hud {
+    left: 18px;
+    right: 18px;
+  }
+  .nav-link svg {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .topbar {
+    height: 70px;
+    gap: 8px;
+    padding: 0 13px;
+  }
+  .brand {
+    font-size: 15px;
+    letter-spacing: 1px;
+    gap: 6px;
+  }
+  .brand small {
+    font-size: 6px;
+    letter-spacing: 2px;
+    margin-top: 5px;
+  }
+  .brand-mark,
+  .brand-mark svg {
+    width: 27px;
+    height: 27px;
+  }
+  .topbar nav {
+    gap: 10px;
+  }
+  .nav-link span {
+    display: none;
+  }
+  .nav-link svg {
+    display: block;
+    width: 19px;
+    height: 19px;
+  }
+  .nav-link.active {
+    display: none;
+  }
+  .header-end {
+    gap: 5px;
+  }
+  .icon-btn {
+    width: 29px;
+    height: 29px;
+  }
+  .dashboard {
+    padding: 12px 10px;
+  }
+  .sea-topline {
+    font-size: 8px;
+    padding: 0 2px;
+    height: 24px;
+  }
+  .sea-divider {
+    margin: 0 6px;
+  }
+  .coordinates {
+    font-size: 7px;
+    letter-spacing: 0.2px;
+  }
+  .game-frame {
+    height: calc(100svh - 117px);
+    min-height: 540px;
+    max-height: 850px;
+  }
+  .world-badge {
+    top: 17px;
+    left: 14px;
+    gap: 8px;
+  }
+  .world-badge > span {
+    font-size: 24px;
+  }
+  .world-badge strong {
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+  .world-badge div > span {
+    font-size: 10px;
+  }
+  .canvas-actions {
+    right: 12px;
+    top: 14px;
+  }
+  .glass-button {
+    width: 28px;
+    height: 28px;
+  }
+  .target-pointer {
+    top: 65px;
+    right: 12px;
+    padding: 7px 9px;
+    gap: 7px;
+  }
+  .target-pointer div {
+    font-size: 12px;
+  }
+  .target-pointer > span {
+    font-size: 18px;
+  }
+  .target-pointer b {
+    font-size: 8px;
+    margin-left: 5px;
+  }
+  .target-pointer small {
+    font-size: 7px;
+  }
+  .bottom-hud {
+    bottom: 126px;
+    left: 14px;
+    right: 13px;
+    align-items: flex-end;
+  }
+  .mini-map {
+    width: 93px;
+    padding: 3px;
+  }
+  .mini-map canvas {
+    width: 85px;
+    height: 59px;
+  }
+  .mini-map > span {
+    font-size: 5px;
+    letter-spacing: 0.6px;
+  }
+  .mini-map kbd {
+    font-size: 6px;
+  }
+  .realm-control > button {
+    width: 36px;
+    height: 36px;
+  }
+  .realm-control {
+    gap: 8px;
+  }
+  .realm-control > div {
+    width: 103px;
+  }
+  .realm-control > div > span {
+    font-size: 7px;
+    letter-spacing: 0.7px;
+  }
+  .realm-control small {
+    font-size: 8px;
+  }
+  .intro-overlay {
+    padding: 20px;
+    align-items: center;
+    background: #12333b55;
+  }
+  .intro-card {
+    padding: 26px 23px;
+    backdrop-filter: blur(6px);
+  }
+  .intro-card h2 {
+    font-size: 37px;
+  }
+  .intro-card .eyebrow {
+    font-size: 7px;
+  }
+  .intro-card p {
+    font-size: 10px;
+  }
+  .intro-ornament {
+    margin: 17px 0 10px;
+  }
+  .intro-caption {
+    bottom: 20px;
+    font-size: 6px;
+    letter-spacing: 1.5px;
+  }
+  .intro-caption span {
+    font-size: 10px;
+  }
+  .controls-bar {
+    display: none;
+  }
+  .touch-controls {
+    display: flex;
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+  }
+  .touch-controls button {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    border: 1px solid #c6d7bd70;
+    background: #0f3546a6;
+    color: #e3e5c7;
+    backdrop-filter: blur(5px);
+    pointer-events: auto;
+  }
+  .dpad {
+    display: grid;
+    grid-template-columns: 38px 38px 38px;
+    grid-template-rows: 38px 38px;
+    gap: 3px;
+  }
+  .dpad button {
+    border-radius: 6px;
+    font-size: 21px;
+  }
+  .dpad button[data-move="up"] {
+    grid-column: 2;
+  }
+  .dpad button[data-move="left"] {
+    grid-row: 2;
+    grid-column: 1;
+  }
+  .dpad button[data-move="down"] {
+    grid-row: 2;
+    grid-column: 2;
+  }
+  .dpad button[data-move="right"] {
+    grid-row: 2;
+    grid-column: 3;
+  }
+  .touch-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .touch-actions button {
+    border-radius: 50%;
+    height: 43px;
+    width: 43px;
+    font-size: 22px;
+  }
+  .touch-actions #touch-fire {
+    width: 61px;
+    height: 61px;
+    font-size: 33px;
+    background: #bcaa6dd0;
+    color: #203b40;
+    border-color: #e7d9a5;
+  }
+  .interact-prompt {
+    bottom: 222px;
+    padding: 10px 13px;
+    font-size: 10px;
+    max-width: calc(100% - 24px);
+    white-space: normal;
+  }
+  .toast-stack {
+    top: 112px;
+    left: 13px;
+    max-width: calc(100% - 26px);
+  }
+  .toast {
+    font-size: 10px;
+    padding: 9px 12px;
+  }
+  .sidebar {
+    padding: 12px 8px;
+    gap: 24px;
+    grid-template-columns: 1fr;
+  }
+  .quest-panel {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .quest-list {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .quest-list li {
+    flex: 1;
+    min-width: 100px;
+    align-items: flex-start;
+    gap: 7px;
+  }
+  .quest-list small {
+    font-size: 8px;
+    line-height: 1.7;
+  }
+  .quest-dot {
+    width: 8px;
+    height: 8px;
+    margin-top: 3px;
+  }
+  .relic-glyph {
+    display: none;
+  }
+  .ship-stats {
+    justify-content: flex-start;
+    gap: 50px;
+  }
+  .control-grid {
+    grid-template-columns: 1fr;
+  }
+  dialog {
+    padding: 23px;
+  }
+  .modal-heading h2 {
+    font-size: 27px;
+  }
+  .upgrade-item {
+    padding: 12px;
+    gap: 10px;
+  }
+  .upgrade-item h3 {
+    font-size: 18px;
+  }
+  .upgrade-item p {
+    font-size: 10px;
+  }
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+  .modal-actions .secondary-button {
+    flex: 1;
+  }
+}
+@media (pointer: coarse) and (min-width: 561px) {
+  .touch-controls {
+    display: flex;
+    position: absolute;
+    bottom: 90px;
+    left: 20px;
+    right: 20px;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .dpad {
+    display: grid;
+    grid-template-columns: 38px 38px 38px;
+    gap: 3px;
+  }
+  .dpad button:first-child {
+    grid-column: 2;
+  }
+  .dpad button:nth-child(2) {
+    grid-column: 1;
+  }
+  .touch-controls button {
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    background: #183c49b0;
+    color: #e1e7d1;
+    border: 1px solid #b4c7ad60;
+    border-radius: 6px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+  .touch-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .touch-actions button {
+    border-radius: 50%;
+    width: 49px;
+    height: 49px;
+    font-size: 25px;
+  }
+  .interact-prompt {
+    bottom: 195px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation-duration: 0.01ms !important;
+    transition: none !important;
+  }
+}
+</style>
+  </head>
+  <body>
+    <svg
+      class="svg-library"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <defs>
+        <symbol id="i-compass" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="m16 8-2 6-6 2 2-6 6-2Z" />
+          <path d="M12 1v2m0 18v2M1 12h2m18 0h2" />
+        </symbol>
+        <symbol id="i-map" viewBox="0 0 24 24">
+          <path d="m3 5 6-2 6 3 6-2v15l-6 2-6-3-6 2V5Zm6-2v15m6-12v15" />
+        </symbol>
+        <symbol id="i-book" viewBox="0 0 24 24">
+          <path
+            d="M5 3h15v18H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 0v14h15M9 7h7m-7 4h5"
+          />
+        </symbol>
+        <symbol id="i-anchor" viewBox="0 0 24 24">
+          <circle cx="12" cy="5" r="3" />
+          <path
+            d="M12 8v13M7 11h10M3 15l1 4 8 3 8-3 1-4M1 16l2-2 3 2m12 0 3-2 2 2"
+          />
+        </symbol>
+        <symbol id="i-sail" viewBox="0 0 24 24">
+          <path d="M12 2v16H3L12 2Zm3 4 6 12h-6V6ZM2 21h20" />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24">
+          <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+        </symbol>
+        <symbol id="i-cross" viewBox="0 0 24 24">
+          <path d="m5 5 14 14M5 19 19 5" />
+        </symbol>
+        <symbol id="i-sound" viewBox="0 0 24 24">
+          <path
+            d="M3 9h4l5-5v16l-5-5H3V9Zm13-2a7 7 0 0 1 0 10m3-13a11 11 0 0 1 0 16"
+          />
+        </symbol>
+      </defs>
+    </svg>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Marea Negra, inicio"
+        ><span class="brand-mark"
+          ><svg><use href="#i-compass" /></svg></span
+        ><span>MAREA NEGRA<small>ECOS DEL ABISMO</small></span></a
+      >
+      <nav aria-label="Navegación principal">
+        <button class="nav-link active" id="voyage-btn">
+          <svg><use href="#i-compass" /></svg><span>Travesía</span></button
+        ><button class="nav-link" id="map-btn">
+          <svg><use href="#i-map" /></svg><span>Carta náutica</span
+          ><kbd>M</kbd></button
+        ><button class="nav-link" id="log-btn">
+          <svg><use href="#i-book" /></svg><span>Bitácora</span>
+        </button>
+      </nav>
+      <div class="header-end">
+        <span class="save-status" id="save-status"><i></i> Guardado local</span
+        ><button
+          class="icon-btn"
+          id="sound-btn"
+          aria-label="Activar sonido"
+          title="Activar sonido"
+          aria-pressed="false"
+        >
+          <svg><use href="#i-sound" /></svg
+          ><span class="sound-off">/</span></button
+        ><button
+          class="icon-btn help-btn"
+          id="help-btn"
+          aria-label="Cómo jugar"
+        >
+          ?
+        </button>
+      </div>
+    </header>
+    <main class="dashboard">
+      <aside class="sidebar">
+        <section class="voyage-heading">
+          <span class="eyebrow">TU PRÓXIMA GRAN HISTORIA</span>
+          <h1>Donde acaba<br />el mapa.</h1>
+          <p>El mar guarda sus secretos.<br />Haz que te los cuente.</p>
+          <div class="edition">
+            <span>ARCHIPIÉLAGO DE LAS ÁNIMAS</span><span>01 — 08</span>
+          </div>
+        </section>
+        <section class="quest-panel">
+          <div class="section-title">
+            <h2>LA TRAVESÍA</h2>
+            <span id="quest-count">0 / 3</span>
+          </div>
+          <div class="quest-main">
+            <span class="quest-icon">✧</span>
+            <div>
+              <h3>El corazón del abismo</h3>
+              <p>Reúne las tres reliquias y despierta al guardián del mar.</p>
+            </div>
+          </div>
+          <ol class="quest-list" id="quest-list">
+            <li data-relic="sun">
+              <span class="quest-dot"></span>
+              <div>El oro del sol<small>Isla del Sol · mundo real</small></div>
+              <span class="relic-glyph">☀</span>
+            </li>
+            <li data-relic="moon">
+              <span class="quest-dot"></span>
+              <div>
+                La lágrima de luna<small>Velo de Luna · mar espectral</small>
+              </div>
+              <span class="relic-glyph">☾</span>
+            </li>
+            <li data-relic="tide">
+              <span class="quest-dot"></span>
+              <div>
+                La voz de la marea<small>Colmillo Rojo · aguas hostiles</small>
+              </div>
+              <span class="relic-glyph">≋</span>
+            </li>
+          </ol>
+          <div class="quest-tip" id="quest-tip">
+            <svg><use href="#i-compass" /></svg>
+            <p>Tu brújula señala la próxima reliquia.</p>
+          </div>
+        </section>
+        <section class="ship-panel">
+          <div class="section-title">
+            <h2>TU NAVÍO</h2>
+            <span class="ship-level" id="ship-level">NIV. 1</span>
+          </div>
+          <div class="ship-name">
+            <svg><use href="#i-sail" /></svg>
+            <div>
+              <h3>La Peregrina</h3>
+              <p>Balandra de los mares libres</p>
+            </div>
+          </div>
+          <div class="hull-label">
+            <span>Integridad del casco</span
+            ><strong id="hp-label">130 / 130</strong>
+          </div>
+          <div class="meter hull-meter"><span id="hp-bar"></span></div>
+          <div class="ship-stats">
+            <div>
+              <span>◈</span><strong id="gold-label">120</strong
+              ><small>DOBLONES</small>
+            </div>
+            <div>
+              <span>⚑</span><strong id="sunk-label">0</strong
+              ><small>VICTORIAS</small>
+            </div>
+            <div>
+              <span>⌖</span><strong id="islands-label">1 / 8</strong
+              ><small>ISLAS</small>
+            </div>
+          </div>
+          <button class="port-button" id="port-btn">
+            <svg><use href="#i-anchor" /></svg> Astillero y mejoras
+            <span>↗</span>
+          </button>
+        </section>
+        <div class="sidebar-footer">
+          <span class="small-compass">✥</span>
+          <p>NO TODOS LOS TESOROS<br />ESTÁN BAJO TIERRA.</p>
+        </div>
+      </aside>
+      <section class="sea-section" aria-label="Zona de juego">
+        <div class="sea-topline">
+          <div>
+            <span class="live-dot"></span
+            ><strong id="region-label">Puerto Bruma</strong
+            ><span class="sea-divider">/</span
+            ><span id="realm-label">Mar de los vivos</span>
+          </div>
+          <span class="coordinates" id="coordinates"
+            >18° 24′ N &nbsp; 64° 45′ O</span
+          >
+        </div>
+        <div class="game-frame" id="game-frame">
+          <canvas
+            id="game"
+            tabindex="0"
+            aria-label="Juego naval. Usa WASD o las flechas para navegar, espacio para disparar, Q para cambiar de mundo y E para interactuar."
+          ></canvas>
+          <div class="world-badge">
+            <span id="world-icon">☀</span>
+            <div>
+              <strong id="world-name">MAR DE LOS VIVOS</strong
+              ><span id="world-desc">La calma nunca es para siempre</span>
+            </div>
+          </div>
+          <div class="canvas-actions">
+            <button
+              class="glass-button"
+              id="pause-btn"
+              aria-label="Pausar juego"
+              title="Pausar (Esc)"
+            >
+              II</button
+            ><button
+              class="glass-button"
+              id="fullscreen-btn"
+              aria-label="Pantalla completa"
+              title="Pantalla completa"
+            >
+              ⛶
+            </button>
+          </div>
+          <div
+            class="toast-stack"
+            id="toasts"
+            role="status"
+            aria-live="polite"
+          ></div>
+          <div class="target-pointer" id="target-pointer">
+            <span>✧</span>
+            <div id="target-text">
+              Isla del Sol<small>Próxima reliquia</small>
+            </div>
+            <b id="target-distance">940 m</b>
+          </div>
+          <button class="interact-prompt" id="interact-prompt" hidden>
+            <kbd>E</kbd><span>Explorar isla</span><b>→</b>
+          </button>
+          <div class="bottom-hud">
+            <div class="realm-control">
+              <button id="realm-btn" aria-label="Alternar mar espectral">
+                <svg><use href="#i-moon" /></svg>
+              </button>
+              <div>
+                <span>VELO ESPECTRAL <kbd>Q</kbd></span>
+                <div class="meter"><span id="energy-bar"></span></div>
+                <small id="energy-label">Listo para cruzar</small>
+              </div>
+            </div>
+            <div class="wind-indicator">
+              <svg><use href="#i-compass" /></svg>
+              <div>
+                <span>VIENTO DEL ESTE</span
+                ><strong>12 nudos <small>↗</small></strong>
+              </div>
+            </div>
+            <button
+              class="mini-map"
+              id="mini-map-btn"
+              aria-label="Abrir carta náutica"
+            >
+              <canvas id="minimap" width="160" height="112"></canvas
+              ><span>CARTA NÁUTICA <kbd>M</kbd></span>
+            </button>
+          </div>
+          <div class="touch-controls" id="touch-controls">
+            <div class="dpad">
+              <button data-move="up" aria-label="Navegar hacia arriba">↑</button
+              ><button data-move="left" aria-label="Navegar a la izquierda">
+                ←</button
+              ><button data-move="down" aria-label="Navegar hacia abajo">
+                ↓</button
+              ><button data-move="right" aria-label="Navegar a la derecha">
+                →
+              </button>
+            </div>
+            <div class="touch-actions">
+              <button id="touch-boost" aria-label="Impulso de velas">➤</button
+              ><button id="touch-fire" aria-label="Disparar cañones">⌖</button>
+            </div>
+          </div>
+          <div class="intro-overlay" id="intro-overlay">
+            <div class="intro-card">
+              <span class="eyebrow">UNA AVENTURA ENTRE DOS MUNDOS</span>
+              <div class="intro-ornament">✧</div>
+              <h2>El horizonte<br />es solo el principio.</h2>
+              <p>
+                Un mar por descubrir. Tres reliquias olvidadas.<br />Y un
+                secreto que solo los muertos conocen.
+              </p>
+              <button class="primary-button" id="start-btn">
+                Izar las velas <span>→</span></button
+              ><button class="continue-button" id="continue-btn" hidden>
+                Continuar mi travesía <span>↗</span></button
+              ><span class="intro-footnote"
+                >EXPLORA · COMBATE · CRUZA EL VELO</span
+              >
+            </div>
+            <div class="intro-caption">
+              EL ARCHIPIÉLAGO DE LAS ÁNIMAS<span
+                >Un lugar al que los mapas no se atreven a llegar.</span
+              >
+            </div>
+          </div>
+        </div>
+        <footer class="controls-bar">
+          <span><kbd>W A S D</kbd> / <kbd>↑ ← ↓ →</kbd> Navegar</span
+          ><span><kbd>ESPACIO</kbd> Cañones</span
+          ><span><kbd>SHIFT</kbd> Impulso</span
+          ><span><kbd>E</kbd> Interactuar</span
+          ><span class="controls-more"
+            ><button id="controls-help">Todos los controles ↗</button></span
+          >
+        </footer>
+        <div class="sea-bottomline">
+          <span>EXPLORAR ES OTRA FORMA DE SER LIBRE.</span
+          ><span id="session-status"
+            >Una aventura original · Sin conexión una vez cargada</span
+          >
+        </div>
+      </section>
+    </main>
+    <dialog id="modal" aria-labelledby="modal-title">
+      <div class="modal-heading">
+        <div>
+          <span class="eyebrow" id="modal-eyebrow">MAREA NEGRA</span>
+          <h2 id="modal-title"></h2>
+        </div>
+        <button class="icon-btn" id="close-modal" aria-label="Cerrar ventana">
+          <svg><use href="#i-cross" /></svg>
+        </button>
+      </div>
+      <div id="modal-body"></div>
+    </dialog>
+    <script>(()=>{var v={width:3200,height:2400},de="marea-negra-v1",R=[{id:"port",name:"Puerto Bruma",x:530,y:1390,r:152,kind:"port",seed:3,subtitle:"Un refugio entre mareas",lore:"Aqu\xED nadie pregunta de d\xF3nde vienes. Solo si tu barco volver\xE1 a salir. El viejo astillero mantiene a La Peregrina a flote."},{id:"sun",name:"Isla del Sol",x:1020,y:730,r:143,kind:"relic",realm:"real",seed:12,glyph:"\u2600",treasure:85,lore:"Bajo las ra\xEDces de una palmera centenaria brilla un disco de oro. Su calor no viene del sol: es el primer latido del Coraz\xF3n del Abismo."},{id:"palms",name:"Las Dos Palmas",x:370,y:490,r:102,kind:"treasure",seed:29,treasure:65,lore:"Dos palmeras entrelazadas marcan el escondite de un contrabandista. Sus doblones siguen aqu\xED. \xC9l tuvo menos suerte."},{id:"moon",name:"Velo de Luna",x:1860,y:410,r:125,kind:"relic",realm:"spectral",seed:17,glyph:"\u263E",treasure:110,lore:"Al otro lado del velo, las piedras cantan. Una l\xE1grima de plata flota sobre el altar: el recuerdo de una luna que cay\xF3 al mar."},{id:"tide",name:"Colmillo Rojo",x:2280,y:1520,r:155,kind:"relic",realm:"real",seed:37,glyph:"\u224B",treasure:130,lore:"La flota del Diente Rojo custodiaba una caracola de cristal. Ac\xE9rcala al o\xEDdo: escuchar\xE1s las coordenadas de un mar que todav\xEDa no existe."},{id:"haven",name:"Refugio del N\xE1ufrago",x:1350,y:1890,r:118,kind:"port",seed:41,subtitle:"Astillero del sur",lore:"Un carpintero retirado convirti\xF3 este arrecife en un hogar para barcos perdidos. Repara el casco y prepara tu pr\xF3xima expedici\xF3n."},{id:"bones",name:"Isla de los Huesos",x:2840,y:2020,r:122,kind:"treasure",seed:53,treasure:100,lore:"El cofre estaba bajo una bandera que el viento olvid\xF3. Una nota dice: \xABG\xE1stalo en algo que te haga sentir vivo\xBB."},{id:"rift",name:"La Boca del Abismo",x:2770,y:580,r:122,kind:"rift",seed:71,lore:"Tres reliquias. Una puerta. El Almirante Hueco lleva siglos esperando a alguien capaz de llegar hasta aqu\xED."}],g=(a,e)=>Math.hypot(a.x-e.x,a.y-e.y),z=(a,e,o)=>Math.max(e,Math.min(o,a));function we(a){let e=a;return()=>(e=e*16807%2147483647,(e-1)/2147483646)}var ve=(a,e)=>Math.atan2(Math.sin(e-a),Math.cos(e-a));function O(a,e,o,n="real",r=!1){return{id:a,x:e,y:o,homeX:e,homeY:o,angle:-1,hp:r?520:70,maxHp:r?520:70,realm:n,boss:r,cooldown:r?2.5:1.8,dead:!1,hit:0}}function X(){return{version:1,time:0,active:!1,realm:"real",player:{x:530,y:1640,angle:-Math.PI/2,vx:0,vy:0,hp:130,maxHp:130,energy:100,gold:120,reload:0,boost:0,boostCooldown:0,invulnerable:0},upgrades:{hull:0,cannons:0,sails:0},relics:[],discovered:["port"],looted:[],sunk:0,deaths:0,won:!1,bossAwake:!1,enemies:[O("corsair-1",1280,1040),O("corsair-2",2020,1450),O("corsair-3",2490,1710),O("corsair-4",800,420),O("shade-1",2090,650,"spectral"),O("shade-2",2720,1840,"spectral")],bullets:[],particles:[],loot:[],trail:[],events:[],journal:[{time:0,text:"La Peregrina zarpa de Puerto Bruma. Tres reliquias nos esperan m\xE1s all\xE1 del horizonte."}],waypoint:null,damageClock:0,autosave:0}}function S(a,e,o="info",n=null){a.events.push({text:e,type:o,sound:n})}function B(a,e){a.journal.unshift({time:a.time,text:e}),a.journal=a.journal.slice(0,60)}function J(a){if(a.waypoint)return{...a.waypoint,name:"Rumbo marcado",custom:!0};let e=["sun","moon","tide"].find(o=>!a.relics.includes(o));return R.find(o=>o.id===(e||(a.won?"port":"rift")))}function ce(a){return[...R].sort((e,o)=>g(e,a.player)-e.r-(g(o,a.player)-o.r))[0]}function te(a){let e=ce(a);return g(e,a.player)<e.r+125?e:null}function _(a){return R.some(e=>e.kind==="port"&&g(e,a.player)<e.r+150)}function $e(a,e){return a.enemies.some(o=>!o.dead&&!o.boss&&o.realm===a.realm&&g(o,e)<e.r+290)}function oe(a){return a.realm==="real"&&a.player.energy<22?(S(a,"Le falta energ\xEDa a la br\xFAjula. Deja que el velo se recupere.","danger"),!1):(a.realm=a.realm==="real"?"spectral":"real",a.player.invulnerable=Math.max(a.player.invulnerable,.8),U(a,a.player.x,a.player.y,a.realm==="spectral"?"#bda5ed":"#f2d792",32),S(a,a.realm==="spectral"?"Has cruzado el velo. Aqu\xED navegan los olvidados.":"Vuelves al mar de los vivos.","info","realm"),!0)}function re(a){return a.player.boostCooldown>0?!1:(a.player.boost=1.2,a.player.boostCooldown=6,S(a,"\xA1Todo el trapo al viento!","info","boost"),!0)}function Z(a,e){let o=a.player;if(o.reload>0)return!1;let n=a.enemies.filter(i=>!i.dead&&i.realm===a.realm&&g(i,o)<650).sort((i,f)=>g(i,o)-g(f,o)),r=e||n[0],t=r?Math.atan2(r.y-o.y,r.x-o.x):o.angle,d=a.upgrades.cannons>=2?3:a.upgrades.cannons>=1?2:1;for(let i=0;i<d;i++){let f=(i-(d-1)/2)*.085;a.bullets.push({x:o.x+Math.cos(t)*30,y:o.y+Math.sin(t)*30,vx:Math.cos(t+f)*550,vy:Math.sin(t+f)*550,life:1.3,damage:28+a.upgrades.cannons*5,owner:"player",realm:a.realm})}return o.reload=.72-a.upgrades.cannons*.07,U(a,o.x+Math.cos(t)*30,o.y+Math.sin(t)*30,"#ffdb93",8),a.events.push({sound:"cannon"}),!0}function U(a,e,o,n,r=12){for(let t=0;t<r;t++){let d=Math.random()*Math.PI*2,i=25+Math.random()*95;a.particles.push({x:e,y:o,vx:Math.cos(d)*i,vy:Math.sin(d)*i,life:.35+Math.random()*.7,maxLife:1.05,color:n,size:1+Math.random()*4})}}function xe(a,e=22){for(let o of R){if(o.kind==="rift")continue;let n=g(a,o),r=o.r*.86+e;if(n<r){let t=Math.atan2(a.y-o.y,a.x-o.x);a.x=o.x+Math.cos(t)*r,a.y=o.y+Math.sin(t)*r}}}function se(a,e){if(!(a.player.invulnerable>0||a.won)&&(a.player.hp=Math.max(0,a.player.hp-e),a.player.invulnerable=.45,U(a,a.player.x,a.player.y,"#d98864",12),a.events.push({sound:"hit"}),a.player.hp<=0)){let o=Math.ceil(a.player.gold*.15);a.player.gold-=o,a.deaths++,Object.assign(a.player,{x:530,y:1640,angle:-Math.PI/2,vx:0,vy:0,hp:a.player.maxHp,energy:100,invulnerable:5}),a.realm="real",a.bullets=[],a.trail=[],a.waypoint=null;for(let r of a.enemies)r.dead||(r.x=r.homeX,r.y=r.homeY,r.hp=r.maxHp);let n=`La tripulaci\xF3n te rescat\xF3. Pierdes ${o} doblones, pero conservas tus reliquias y mejoras.`;B(a,n),S(a,n,"danger","sunk"),a.events.push({kind:"respawn"})}}function Se(a,e,o={}){if(e=Math.min(e,.05),!a.active||e<=0)return;a.time+=e,a.autosave+=e;let n=a.player;n.reload=Math.max(0,n.reload-e),n.boost=Math.max(0,n.boost-e),n.boostCooldown=Math.max(0,n.boostCooldown-e),n.invulnerable=Math.max(0,n.invulnerable-e),a.realm==="spectral"?(n.energy=Math.max(0,n.energy-e*4),n.energy||oe(a)):n.energy=Math.min(100,n.energy+e*6),o.boost&&re(a);let r=+!!o.right-+!!o.left,t=+!!o.down-+!!o.up,d=Math.hypot(r,t),i=(155+a.upgrades.sails*25)*(n.boost>0?2.15:1),f=Math.min(1,e*4);n.vx+=((d?r/d*i:0)-n.vx)*f,n.vy+=((d?t/d*i:0)-n.vy)*f,n.x=z(n.x+n.vx*e,35,v.width-35),n.y=z(n.y+n.vy*e,35,v.height-35),d&&(n.angle+=ve(n.angle,Math.atan2(t,r))*Math.min(1,e*5)),xe(n),o.fire&&Z(a),Math.hypot(n.vx,n.vy)>15&&Math.floor(a.time*15)!==Math.floor((a.time-e)*15)&&a.trail.push({x:n.x-Math.cos(n.angle)*27,y:n.y-Math.sin(n.angle)*27,life:2,angle:n.angle});for(let l of a.trail)l.life-=e;a.trail=a.trail.filter(l=>l.life>0);for(let l of R)!a.discovered.includes(l.id)&&g(l,n)<l.r+390&&(a.discovered.push(l.id),B(a,`Descubrimos ${l.name}.`),S(a,`Tierra a la vista: ${l.name}`,"success","discovery"));a.waypoint&&g(n,a.waypoint)<85&&(a.waypoint=null,S(a,"Has llegado al rumbo marcado. La br\xFAjula vuelve a tu misi\xF3n."));let m=_(a);m&&(n.hp=Math.min(n.maxHp,n.hp+e*7));for(let l of a.enemies){if(l.dead||(l.hit=Math.max(0,l.hit-e),l.cooldown-=e,l.realm!==a.realm))continue;let c=g(n,l),h=c<(l.boss?900:620)&&!m,P=h?n.x:l.homeX+Math.sin(a.time*.14+l.homeY)*90,V=h?n.y:l.homeY+Math.cos(a.time*.14+l.homeX)*90,Q=Math.atan2(V-l.y,P-l.x);h&&c<(l.boss?290:215)&&(Q+=Math.PI/2),l.angle+=ve(l.angle,Q)*Math.min(1,e*1.7);let F=l.boss?73:64;if(l.x=z(l.x+Math.cos(l.angle)*F*e,30,v.width-30),l.y=z(l.y+Math.sin(l.angle)*F*e,30,v.height-30),xe(l,l.boss?35:21),h&&c<(l.boss?670:480)&&l.cooldown<=0){let s=Math.atan2(n.y+n.vy*.28-l.y,n.x+n.vx*.28-l.x),b=l.boss?5:1;for(let x=0;x<b;x++){let A=s+(x-(b-1)/2)*.18;a.bullets.push({x:l.x+Math.cos(A)*30,y:l.y+Math.sin(A)*30,vx:Math.cos(A)*215,vy:Math.sin(A)*215,life:3,damage:l.boss?19:14,owner:l.id,realm:l.realm})}l.cooldown=l.boss?2.2:2.4}h&&c<(l.boss?55:40)&&se(a,10)}for(let l of a.bullets)if(l.life-=e,l.x+=l.vx*e,l.y+=l.vy*e,!(l.life<=0||l.realm!==a.realm)){if(l.owner==="player"){for(let c of a.enemies)if(!c.dead&&c.realm===l.realm&&g(c,l)<(c.boss?43:27)){l.life=0,c.hp-=l.damage,c.hit=.18,U(a,l.x,l.y,c.realm==="spectral"?"#b1e3d5":"#ecc28b",9),a.events.push({sound:"hit"}),c.hp<=0&&(c.dead=!0,a.sunk++,U(a,c.x,c.y,c.boss?"#ccb4ff":"#efbc74",38),c.boss?(a.won=!0,n.gold+=500,a.realm="real",a.bullets=[],n.hp=n.maxHp,B(a,"El Almirante Hueco ha ca\xEDdo. El Coraz\xF3n del Abismo vuelve a latir. Los dos mares son libres."),a.events.push({kind:"victory",sound:"victory"})):(a.loot.push({x:c.x,y:c.y,amount:60,life:90,realm:c.realm}),S(a,"\xA1Nav\xEDo hundido! Recoge los doblones flotantes.","success","sunk"),B(a,`Derrotamos ${c.realm==="spectral"?"un nav\xEDo espectral":"un corsario del Diente Rojo"}.`)));break}}else!m&&g(n,l)<24&&(l.life=0,se(a,l.damage));l.life>0&&R.some(c=>c.kind!=="rift"&&g(c,l)<c.r*.77)&&(l.life=0,U(a,l.x,l.y,"#ceb991",4))}a.bullets=a.bullets.filter(l=>l.life>0);for(let l of a.loot){if(l.life-=e,l.realm!==a.realm)continue;let c=g(n,l);c<130&&c>1&&(l.x+=(n.x-l.x)/c*145*e,l.y+=(n.y-l.y)/c*145*e),c<32&&(n.gold+=l.amount,l.life=0,S(a,`+${l.amount} doblones recuperados.`,"success","coin"))}a.loot=a.loot.filter(l=>l.life>0);for(let l of a.particles)l.x+=l.vx*e,l.y+=l.vy*e,l.life-=e;a.particles=a.particles.filter(l=>l.life>0),a.realm==="real"&&Math.hypot(n.x-1610,n.y-1200)<145&&!m?(a.damageClock+=e,a.damageClock>1.4&&(a.damageClock=0,se(a,6),S(a,"\xA1Tormenta! Sal de las nubes o cruza al mar espectral.","danger"))):a.damageClock=0}function ke(a){let e=te(a);return e?e.kind==="port"?{kind:"port",island:e}:e.kind==="rift"?a.won?{kind:"story",island:e,title:"El mar vuelve a ser libre",text:"El Coraz\xF3n del Abismo late en calma. Tu tripulaci\xF3n ya es leyenda. A\xFAn quedan costas que explorar."}:a.relics.length<3?(S(a,"La grieta exige las tres reliquias. Sigue la br\xFAjula.","danger"),null):a.realm!=="spectral"?(S(a,"El guardi\xE1n espera al otro lado. Cruza el velo con Q.","info"),null):a.bossAwake?(S(a,"El Almirante Hueco ya ha despertado. \xA1A los ca\xF1ones!"),null):(a.bossAwake=!0,a.enemies.push(O("admiral",e.x-80,e.y+280,"spectral",!0)),a.player.energy=100,B(a,"Las reliquias abrieron la Boca del Abismo. El Almirante Hueco ha despertado."),S(a,"\xA1El Almirante Hueco emerge del abismo!","danger","boss"),{kind:"boss"}):a.looted.includes(e.id)?{kind:"story",island:e,title:e.name,text:"Esta costa ya te entreg\xF3 su secreto. Consulta la carta n\xE1utica para trazar tu pr\xF3ximo rumbo."}:e.realm&&e.realm!==a.realm?(S(a,e.realm==="spectral"?"El altar est\xE1 al otro lado del velo. Pulsa Q para encontrarlo.":"Este tesoro pertenece a los vivos. Regresa con Q.","info"),null):e.id==="tide"&&$e(a,e)?(S(a,"Los corsarios vigilan la costa. H\xFAndelos o al\xE9jalos de la isla.","danger"),null):(a.looted.push(e.id),a.player.gold+=e.treasure,e.kind==="relic"&&(a.relics.push(e.id),a.waypoint=null),B(a,`${e.kind==="relic"?"Recuperamos una reliquia en":"Encontramos un tesoro en"} ${e.name}. +${e.treasure} doblones.`),U(a,a.player.x,a.player.y,"#f0d193",35),a.events.push({sound:"treasure"}),{kind:"treasure",island:e,title:e.kind==="relic"?{sun:"El oro del sol",moon:"La l\xE1grima de luna",tide:"La voz de la marea"}[e.id]:"Un secreto bien guardado",text:e.lore,amount:e.treasure}):(S(a,"Ac\xE9rcate a la costa de una isla para explorar."),null)}function ue(a,e){return 90+a.upgrades[e]*85}function Me(a,e){if(!["hull","cannons","sails"].includes(e)||!_(a))return!1;let o=ue(a,e);return a.upgrades[e]>=3||a.player.gold<o?!1:(a.player.gold-=o,a.upgrades[e]++,e==="hull"&&(a.player.maxHp=130+a.upgrades.hull*50,a.player.hp=a.player.maxHp),B(a,`El astillero mejora ${{hull:"el casco",cannons:"los ca\xF1ones",sails:"las velas"}[e]} al nivel ${a.upgrades[e]}.`),S(a,"Mejora instalada. \xA1La Peregrina est\xE1 lista!","success","coin"),!0)}function Ae(a){return _(a)?(a.player.hp=a.player.maxHp,a.player.energy=100,S(a,"Casco reparado y br\xFAjula recargada. Invita la casa.","success","coin"),!0):!1}function Te(a){let{active:e,events:o,particles:n,trail:r,bullets:t,...d}=a;return JSON.stringify({...d,player:{...d.player,vx:0,vy:0,boost:0}})}function Ce(a){try{let e=JSON.parse(a);if(e.version!==1||!e.player||!Array.isArray(e.relics)||!Array.isArray(e.enemies))return null;let o=X(),n=e.player;for(let r of["x","y","hp","maxHp","energy","gold","angle"])if(!Number.isFinite(n[r]))return null;return!e.upgrades||!["hull","cannons","sails"].every(r=>Number.isInteger(e.upgrades[r])&&e.upgrades[r]>=0&&e.upgrades[r]<=3)||!["real","spectral"].includes(e.realm)||!Array.isArray(e.discovered)||!Array.isArray(e.looted)||!Array.isArray(e.journal)||!e.enemies.every(r=>Number.isFinite(r.x)&&Number.isFinite(r.y)&&Number.isFinite(r.hp)&&["real","spectral"].includes(r.realm))?null:(Object.assign(o,e,{active:!1,particles:[],events:[],bullets:[],trail:[],autosave:0}),o.player={...X().player,...n,x:z(n.x,35,v.width-35),y:z(n.y,35,v.height-35),vx:0,vy:0,invulnerable:3},o.player.maxHp=130+o.upgrades.hull*50,o.player.hp=z(o.player.hp,1,o.player.maxHp),o.player.energy=z(o.player.energy,0,100),o.loot=Array.isArray(o.loot)?o.loot:[],o)}catch{return null}}var E=Math.PI*2;function y(a,e,o,n=1){a.beginPath(),e.forEach(([r,t],d)=>d?a.lineTo(r,t):a.moveTo(r,t)),a.strokeStyle=o,a.lineWidth=n,a.stroke()}function w(a,e,o,n,r,t,d=0){a.beginPath(),a.ellipse(e,o,n,r,d,0,E),a.fillStyle=t,a.fill()}function q(a,e,o,n=1){a.beginPath();for(let r=0;r<=80;r++){let t=r/80*E,d=1+Math.sin(t*3+o)*.1+Math.cos(t*5+o)*.06+Math.sin(t*7)*.035,i=Math.cos(t)*e*d*n,f=Math.sin(t)*e*d*.76*n;r?a.lineTo(i,f):a.moveTo(i,f)}a.closePath()}function ze(a,e,o,n,r,t){a.save(),a.translate(e,o),a.scale(n,n),w(a,13,16,28,10,"#133e3430",.4),a.beginPath(),a.moveTo(0,9),a.quadraticCurveTo(-8,-9,0,-29),a.strokeStyle=t?"#777580":"#776745",a.lineWidth=5,a.stroke(),a.beginPath(),a.moveTo(1,9),a.quadraticCurveTo(-5,-9,1,-29),a.strokeStyle=t?"#aca0b5":"#a59460",a.lineWidth=2,a.stroke();for(let d=0;d<7;d++){let i=d/7*E+r,f=Math.cos(i)*29,m=-29+Math.sin(i)*17;a.beginPath(),a.moveTo(0,-29),a.quadraticCurveTo(f*.6-7,m-13,f,m+8),a.quadraticCurveTo(f*.65,m-2,0,-29),a.fillStyle=t?["#698b89","#879e98","#466c76"][d%3]:["#3e7950","#598957","#316845","#729658"][d%4],a.fill(),y(a,[[0,-29],[f*.65,m-4],[f,m+8]],t?"#9aaaa170":"#aac17c70",.7)}w(a,0,-28,3,3,"#574c33"),a.restore()}function pe(a,e,o,n=1){a.save(),a.translate(e,o),a.scale(n,n),w(a,7,10,23,12,"#24452e38"),a.fillStyle="#c3b184",a.fillRect(-14,-6,28,24),a.fillStyle="#4e5140",a.fillRect(-3,6,7,12),a.beginPath(),a.moveTo(-21,-5),a.lineTo(0,-26),a.lineTo(21,-5),a.closePath(),a.fillStyle="#947f58",a.fill(),y(a,[[-21,-5],[0,-26],[21,-5]],"#d5c397",2);for(let r=-10;r<=10;r+=5)y(a,[[r,-7],[r*.35,-20]],"#baa375",1);a.restore()}var ne=class{constructor(e,o){this.canvas=e,this.ctx=e.getContext("2d"),this.mini=o,this.camera={x:530,y:1640},this.w=0,this.h=0,this.zoom=1,this.clock=0,this.cache=new Map,this.reducedMotion=matchMedia("(prefers-reduced-motion: reduce)").matches,this.resize()}resize(){let e=this.canvas.getBoundingClientRect();this.w=e.width,this.h=e.height;let o=Math.min(window.devicePixelRatio||1,2);this.canvas.width=Math.round(this.w*o),this.canvas.height=Math.round(this.h*o),this.dpr=o,this.zoom=this.w<550?.69:.91}screenToWorld(e,o){return{x:(e-this.w/2)/this.zoom+this.camera.x,y:(o-this.h/2)/this.zoom+this.camera.y}}snap(e){this.camera.x=e.x,this.camera.y=e.y}islandSprite(e,o){let n=e.id+o;if(this.cache.has(n))return this.cache.get(n);let r=document.createElement("canvas");r.width=560,r.height=500;let t=r.getContext("2d");t.translate(280,250);let d=we(e.seed),i=e.r;q(t,i,e.seed,1.55),t.fillStyle=o?"#56748e14":"#64a59822",t.fill(),q(t,i,e.seed,1.33),t.fillStyle=o?"#829db91c":"#71b09e35",t.fill(),q(t,i,e.seed,1.15),t.fillStyle=o?"#a3bad338":"#aed2b870",t.fill(),t.strokeStyle=o?"#bad1da50":"#d7e6c7aa",t.lineWidth=1.5,t.stroke(),t.save(),t.translate(3,8),q(t,i,e.seed,1),t.fillStyle=o?"#546879":"#a8ab79",t.fill(),t.restore(),q(t,i,e.seed,1),t.fillStyle=o?"#a1a9b6":"#dece96",t.fill(),q(t,i,e.seed,.89),t.strokeStyle=o?"#bdc4ce":"#efdda8",t.lineWidth=7,t.stroke(),q(t,i,e.seed,.77),t.fillStyle=o?"#637e82":"#87985d",t.fill(),q(t,i,e.seed,.64),t.fillStyle=o?"#527176":"#6c8752",t.fill();for(let l=0;l<90;l++){let c=d()*E,h=Math.sqrt(d())*i*.76,P=Math.cos(c)*h,V=Math.sin(c)*h*.69;w(t,P,V,1+d()*3,1+d()*2,o?"#bbc6bf25":"#cad09750")}let f=e.id==="tide"||e.id==="bones";if(f)for(let l=0;l<6;l++){let c=(d()-.5)*i,h=(d()-.5)*i*.6;t.beginPath(),t.moveTo(c-18,h+15),t.lineTo(c-8,h-20-d()*20),t.lineTo(c+8,h-26),t.lineTo(c+22,h+12),t.closePath(),t.fillStyle=o?"#657f8b":"#727c68",t.fill(),y(t,[[c-8,h-20],[c+3,h-7],[c+22,h+12]],o?"#a7afbb":"#aaa68b",2)}let m=e.kind==="port"?9:f?6:13;for(let l=0;l<m;l++){let c=d()*E,h=Math.sqrt(d())*i*.64;ze(t,Math.cos(c)*h,Math.sin(c)*h*.65,.72+d()*.55,d()*6,o)}if(e.kind==="port"){t.save(),t.rotate(-.1),t.fillStyle="#6d6a4c",t.fillRect(-17,75,37,90),t.strokeStyle="#b49b69",t.lineWidth=2;for(let l=80;l<164;l+=7)y(t,[[-17,l],[20,l]],"#b59e70",2);for(let l=86;l<165;l+=28)w(t,-20,l,4,4,"#655d43"),w(t,23,l,4,4,"#655d43");t.restore(),pe(t,-34,20,1.1),pe(t,35,0,.9),pe(t,-3,-39,.8),y(t,[[5,48],[5,6]],"#877d59",3),t.fillStyle="#ede0b3",t.beginPath(),t.moveTo(7,7),t.lineTo(28,13),t.lineTo(7,24),t.fill(),w(t,48,60,13,7,"#8d825744"),t.fillStyle="#ab9361",t.fillRect(39,49,12,13),y(t,[[39,53],[51,53]],"#736a45",2)}else if(e.kind==="relic"){w(t,0,16,28,14,o?"#abc0c52a":"#d3c793");for(let l of[-19,19])t.fillStyle=o?"#98a6b0":"#b5ad86",t.fillRect(l-5,-17,10,35),t.fillStyle=o?"#bdc6cc":"#d2c6a0",t.fillRect(l-8,-21,16,7);t.fillStyle=o?"#879eae":"#b1a981",t.fillRect(-23,14,46,8)}else t.fillStyle="#7b633c",t.fillRect(-12,3,25,17),t.fillStyle="#b9a365",t.fillRect(-13,2,27,5),y(t,[[-4,3],[-4,20]],"#d4bb72",2),y(t,[[6,3],[6,20]],"#d4bb72",2);for(let l=0;l<9;l++){let c=d()*E,h=i*(1+d()*.2);w(t,Math.cos(c)*h,Math.sin(c)*h*.75,3+d()*7,3+d()*4,o?"#7d8e9d":"#b5ae84",d())}return this.cache.set(n,r),r}draw(e,o,n=!1){if(!this.w||!this.h)return;this.clock+=this.reducedMotion?0:o;let r=this.clock,t=this.ctx,d=e.realm==="spectral",i=this.w,f=this.h,m=n?{x:750,y:1050}:e.player,l=1-Math.exp(-o*5);this.camera.x+=(m.x-this.camera.x)*l,this.camera.y+=(m.y-this.camera.y)*l,t.setTransform(this.dpr,0,0,this.dpr,0,0),t.clearRect(0,0,i,f);let c=t.createLinearGradient(0,0,i,f);c.addColorStop(0,d?"#263b56":"#295962"),c.addColorStop(.55,d?"#35465e":"#316c70"),c.addColorStop(1,d?"#172b42":"#17464e"),t.fillStyle=c,t.fillRect(0,0,i,f),t.save(),t.translate(i/2,f/2),t.scale(this.zoom,this.zoom),t.translate(-this.camera.x,-this.camera.y);let h=this.camera.x-i/this.zoom/2,P=this.camera.y-f/this.zoom/2,V=h+i/this.zoom,Q=P+f/this.zoom;for(let s=Math.floor(P/46);s<Q/46+1;s++)for(let b=Math.floor(h/82);b<V/82+1;b++){let x=b*82+s%2*36,A=s*46,ae=Math.sin(b*83.3+s*13.9);t.beginPath(),t.moveTo(x+Math.sin(r*.35+ae)*8,A),t.bezierCurveTo(x+12,A-2-ae*3,x+19,A+3,x+29+ae*13,A),t.strokeStyle=d?"#b0c1d411":"#afccba19",t.lineWidth=.9,t.stroke(),ae>.5&&y(t,[[x+13,A+5],[x+24,A+5]],"#b0d7cb0d",1)}for(let s=0;s<35;s++){let b=s*773%v.width,x=s*397%v.height;w(t,b,x,3,1,d?"#9cb8d012":"#c5d2b513")}t.strokeStyle="#d8d5ad22",t.lineWidth=2,t.setLineDash([10,15]),t.strokeRect(18,18,v.width-36,v.height-36),t.setLineDash([]),this.drawStorm(t,r,d);for(let s of R){if(s.x+s.r*2<h||s.x-s.r*2>V||s.y+s.r*2<P||s.y-s.r*2>Q)continue;if(s.kind==="rift"){this.drawRift(t,s,r,d,e);continue}if(t.drawImage(this.islandSprite(s,d),s.x-280,s.y-250),s.kind==="relic"&&!e.relics.includes(s.id)&&s.realm===e.realm){let x=t.createRadialGradient(s.x,s.y-15,0,s.x,s.y-15,49);x.addColorStop(0,d?"#dcc9ff65":"#fff0b866"),x.addColorStop(1,"#ffffff00"),t.fillStyle=x,t.fillRect(s.x-49,s.y-64,98,98),t.font="28px Georgia",t.textAlign="center",t.fillStyle=d?"#e5d7ff":"#fff2ba",t.shadowColor=t.fillStyle,t.shadowBlur=14,t.fillText(s.glyph,s.x,s.y-12+Math.sin(r*2)*3),t.shadowBlur=0}let b=e.discovered.includes(s.id);t.textAlign="center",t.font="small-caps 14px Georgia",t.fillStyle="#e8e7c5",t.shadowColor="#183c40",t.shadowBlur=4,t.fillText(b||n?s.name:"Costa desconocida",s.x,s.y+s.r*.91+35),t.shadowBlur=0,s.kind==="port"?(t.font="8px Arial",t.fillStyle="#b4cfb4",t.fillText("\u2693  PUERTO SEGURO",s.x,s.y+s.r*.91+51)):e.looted.includes(s.id)&&(t.font="8px Arial",t.fillStyle="#b6cdb1",t.fillText("EXPLORADA",s.x,s.y+s.r*.91+51))}e.waypoint&&(t.strokeStyle="#ebd69a",t.lineWidth=1.5,t.setLineDash([3,6]),t.beginPath(),t.arc(e.waypoint.x,e.waypoint.y,22+Math.sin(r*2)*3,0,E),t.stroke(),t.setLineDash([]),y(t,[[e.waypoint.x-9,e.waypoint.y],[e.waypoint.x+9,e.waypoint.y]],"#efd8a3",1.5),y(t,[[e.waypoint.x,e.waypoint.y-9],[e.waypoint.x,e.waypoint.y+9]],"#efd8a3",1.5));for(let s of e.trail)t.save(),t.globalAlpha=s.life/2*.24,t.translate(s.x,s.y),t.rotate(s.angle),y(t,[[0,-13-(2-s.life)*13],[-8,0],[0,13+(2-s.life)*13]],"#d6e7d8",1.5),t.restore();for(let s of e.loot){if(s.realm!==e.realm)continue;let b=s.y+Math.sin(r*3)*3;w(t,s.x,b+5,13,5,"#152f3935"),w(t,s.x,b,8,6,"#dbc080"),w(t,s.x,b-2,5,3,"#f3da9c"),t.font="10px Arial",t.textAlign="center",t.fillStyle="#ead9a1",t.fillText("+"+s.amount,s.x,b-13)}for(let s of e.enemies)if(!s.dead){if(s.realm!==e.realm){d&&this.ship(t,s,r,!1,!0);continue}if(this.ship(t,s,r,!1),g(s,e.player)<700){let b=s.boss?95:44;t.fillStyle="#152d3980",t.fillRect(s.x-b/2,s.y-58,b,3),t.fillStyle=s.boss?"#c2a1db":"#c8947f",t.fillRect(s.x-b/2,s.y-58,b*Math.max(0,s.hp/s.maxHp),3),s.boss&&(t.fillStyle="#e0ccea",t.font="10px Georgia",t.textAlign="center",t.fillText("EL ALMIRANTE HUECO",s.x,s.y-70))}}this.ship(t,{...e.player,realm:e.realm},r,!0);for(let s of e.bullets)s.realm===e.realm&&(y(t,[[s.x-s.vx*.045,s.y-s.vy*.045],[s.x,s.y]],s.owner==="player"?"#ffe5a77a":"#e6a78b80",3),w(t,s.x,s.y,s.owner==="player"?3.5:4,s.owner==="player"?3.5:4,s.owner==="player"?"#ffe4a0":"#e8a08c"));for(let s of e.particles)t.globalAlpha=Math.max(0,s.life/s.maxLife),w(t,s.x,s.y,s.size,s.size,s.color);if(t.globalAlpha=1,!this.reducedMotion)for(let s=0;s<6;s++){let b=790+s*26+Math.sin(r*.17)*150,x=920+Math.sin(s)*24+Math.cos(r*.2)*80,A=Math.sin(r*4+s)*4;y(t,[[b-6,x+A],[b,x],[b+6,x+A]],d?"#b2bfd559":"#cbd8c594",1.3)}t.restore();let F=t.createRadialGradient(i*.5,f*.4,f*.15,i*.5,f*.5,Math.max(i,f)*.7);F.addColorStop(0,"#06293500"),F.addColorStop(1,d?"#0e172e88":"#052e3b77"),t.fillStyle=F,t.fillRect(0,0,i,f),n||this.drawBearing(t,e),this.drawCompass(t,i-49,f*.48,d),e.player.hp<e.player.maxHp*.3&&!n&&(t.strokeStyle=`rgba(197,95,72,${.28+Math.sin(r*3)*.1})`,t.lineWidth=7,t.strokeRect(3,3,i-6,f-6)),this.drawMap(e,this.mini,!1)}drawStorm(e,o,n){e.save(),e.translate(1610,1200);let r=e.createRadialGradient(0,0,20,0,0,205);r.addColorStop(0,n?"#8894ac10":"#172d4aa0"),r.addColorStop(1,"#142d4900"),e.fillStyle=r,e.fillRect(-210,-210,420,420);for(let t=0;t<7;t++){let d=t*.9+o*.06;e.beginPath(),e.ellipse(Math.cos(d)*35,Math.sin(d)*25,85+t*6,50+t*4,d,0,E),e.strokeStyle=n?"#b6b4d50c":"#a4acbd10",e.lineWidth=7,e.stroke()}if(!n){for(let t=0;t<22;t++){let d=Math.sin(t*13)*120,i=(o*85+t*24)%240-120;y(e,[[d,i],[d-6,i+15]],"#b9c8d03b",1)}e.font="italic 12px Georgia",e.textAlign="center",e.fillStyle="#c2ced09a",e.fillText("El ojo de la tormenta",0,160)}e.restore()}drawRift(e,o,n,r,t){e.save(),e.translate(o.x,o.y);let d=e.createRadialGradient(0,0,5,0,0,170);d.addColorStop(0,r?"#100c30ee":"#122738d0"),d.addColorStop(.45,r?"#8676b94f":"#17394b9f"),d.addColorStop(1,"#22333b00"),e.fillStyle=d,e.fillRect(-170,-170,340,340);for(let i=0;i<9;i++)e.beginPath(),e.ellipse(0,0,15+i*13,8+i*8,n*.13+i*.35,0,E*.83),e.strokeStyle=r?`rgba(185,170,222,${.12+i*.012})`:`rgba(168,197,188,${.05+i*.01})`,e.lineWidth=1.5,e.stroke();e.font="27px Georgia",e.textAlign="center",e.fillStyle=r?"#d7c4ee":"#b0c6be80",e.fillText(t.won?"\u2727":"\u233E",0,6),e.font="14px Georgia",e.fillStyle="#d5daca",e.fillText(o.name,0,156),e.font="8px Arial",e.fillStyle="#a5b7b4",e.fillText(t.won?"EL MAR ES LIBRE":"TRES RELIQUIAS \xB7 UNA PUERTA",0,173),e.restore()}ship(e,o,n,r=!1,t=!1){e.save(),e.translate(o.x,o.y),e.rotate(o.angle+Math.PI/2);let d=o.boss?1.8:r?1:.92;e.scale(d,d),t?e.globalAlpha=.12:r&&o.invulnerable>0&&(e.globalAlpha=.65+Math.sin(n*20)*.25);let i=o.realm==="spectral";w(e,7,12,17,37,"#08293850",-.12),e.beginPath(),e.moveTo(0,-38),e.bezierCurveTo(17,-22,18,17,10,32),e.quadraticCurveTo(0,37,-10,32),e.bezierCurveTo(-18,17,-17,-22,0,-38),e.fillStyle=i?"#46677a":r?"#65523b":"#4e443b",e.fill(),e.strokeStyle=i?"#afc7cc":"#c6aa71",e.lineWidth=1.5,e.stroke(),e.beginPath(),e.moveTo(0,-31),e.bezierCurveTo(11,-17,12,13,7,27),e.lineTo(-7,27),e.bezierCurveTo(-12,13,-11,-17,0,-31),e.fillStyle=i?"#6f8190":"#9a7d52",e.fill();for(let f=-17;f<27;f+=6)y(e,[[-9,f],[9,f]],i?"#adbec344":"#4c49395c",1);y(e,[[0,-48],[0,35]],i?"#bed6d4":"#ceba87",2);for(let f of[-1,1])for(let m of[-8,9])e.fillStyle="#303e3c",e.fillRect(f<0?-20:12,m,8,4);e.beginPath(),e.moveTo(-27,-18),e.quadraticCurveTo(0,-10,27,-18),e.quadraticCurveTo(22,1,26,10),e.quadraticCurveTo(0,17,-26,10),e.quadraticCurveTo(-22,0,-27,-18),e.fillStyle=o.hit>0?"#fff5d8":i?"#c4d4d5":r?"#e9dfbc":"#a96c56",e.fill(),e.strokeStyle=i?"#e0ddec":"#f3e8c84f",e.lineWidth=1,e.stroke(),y(e,[[0,-17],[0,13]],i?"#a0b4bd":"#c4b48c",1),y(e,[[-26,-18],[26,-18]],"#716d5877",1.5),e.beginPath(),e.moveTo(-18,17),e.quadraticCurveTo(0,21,18,17),e.lineTo(15,31),e.quadraticCurveTo(0,34,-15,31),e.closePath(),e.fillStyle=i?"#a8bdc4":r?"#d8ccaa":"#955c4c",e.fill(),r?(e.strokeStyle="#677060",e.lineWidth=1.2,e.beginPath(),e.moveTo(0,-6),e.lineTo(4,0),e.lineTo(0,6),e.lineTo(-4,0),e.closePath(),e.stroke()):(w(e,0,-1,4,4,i?"#52667b":"#e1c8a8"),y(e,[[-5,7],[5,3]],"#e1c8a8",1),y(e,[[-5,3],[5,7]],"#e1c8a8",1)),e.beginPath(),e.moveTo(0,-42),e.lineTo(13+Math.sin(n*4)*2,-38),e.lineTo(0,-33),e.fillStyle=r?"#c7b277":i?"#bac7dc":"#bf7159",e.fill(),e.restore()}drawBearing(e,o){let n=J(o);if(!n)return;let r=(n.x-this.camera.x)*this.zoom,t=(n.y-this.camera.y)*this.zoom;if(Math.abs(r)<this.w/2-80&&Math.abs(t)<this.h/2-100)return;let d=Math.atan2(t,r),i=this.w/2-36,f=this.h/2-95,m=1/Math.max(Math.abs(Math.cos(d))/i,Math.abs(Math.sin(d))/f),l=this.w/2+Math.cos(d)*m,c=this.h/2+Math.sin(d)*m;e.save(),e.translate(l,c),e.rotate(d),e.beginPath(),e.moveTo(9,0),e.lineTo(-5,-5),e.lineTo(-2,0),e.lineTo(-5,5),e.closePath(),e.fillStyle="#e5ca8dbb",e.fill(),e.restore()}drawCompass(e,o,n,r){e.save(),e.translate(o,n),e.globalAlpha=.45,e.strokeStyle=r?"#c5c4d0":"#c6d2b8",e.lineWidth=.7,e.beginPath(),e.arc(0,0,19,0,E),e.stroke();for(let t=0;t<8;t++){let d=t/8*E;y(e,[[Math.cos(d)*16,Math.sin(d)*16],[Math.cos(d)*21,Math.sin(d)*21]],e.strokeStyle,.7)}e.beginPath(),e.moveTo(0,-15),e.lineTo(4,4),e.lineTo(0,1),e.lineTo(-4,4),e.closePath(),e.fillStyle="#e4dab1",e.fill(),e.font="8px Arial",e.textAlign="center",e.fillText("N",0,-27),e.restore()}drawMap(e,o,n=!1){if(!o)return;let r=o.getContext("2d"),t=o.width,d=o.height,i=Math.min((t-20)/v.width,(d-20)/v.height),f=(t-v.width*i)/2,m=(d-v.height*i)/2;r.clearRect(0,0,t,d),r.fillStyle="#ddd4b2",r.fillRect(0,0,t,d),r.save(),r.translate(f,m),r.scale(i,i),r.strokeStyle="#9a9f7830",r.lineWidth=1/i;for(let c=0;c<v.width;c+=400)y(r,[[c,0],[c,v.height]],"#9a9f782a",1/i);for(let c=0;c<v.height;c+=400)y(r,[[0,c],[v.width,c]],"#9a9f782a",1/i);r.setLineDash([4/i,5/i]),r.beginPath(),r.moveTo(e.player.x,e.player.y);let l=J(e);r.lineTo(l.x,l.y),r.strokeStyle="#9a805777",r.lineWidth=1/i,r.stroke(),r.setLineDash([]),n&&(w(r,1610,1200,155,120,"#777e7040"),r.textAlign="center",r.font=`${9/i}px Georgia`,r.fillStyle="#727762",r.fillText("Tormenta",1610,1380));for(let c of R){let h=e.discovered.includes(c.id);if(r.save(),r.translate(c.x,c.y),c.kind==="rift"?(r.beginPath(),r.arc(0,0,c.r*.7,0,E),r.strokeStyle="#716a8366",r.lineWidth=1/i,r.stroke()):(q(r,c.r,c.seed),r.fillStyle=h?"#8a9970":"#9b9c7980",r.fill(),r.strokeStyle="#70855d",r.lineWidth=.5/i,r.stroke()),n){r.textAlign="center",r.font=`${10/i}px Georgia`,r.fillStyle="#4d5c48",r.fillText(c.name,0,c.r+95),r.font=`${13/i}px Georgia`,r.fillStyle=c.kind==="port"?"#496858":c.realm==="spectral"?"#827395":"#987746";let P=e.looted.includes(c.id)?"\u2713":c.kind==="port"?"\u2693":c.glyph||(c.kind==="rift"?"\u233E":"\u25C7");r.fillText(P,0,12/i)}r.restore()}if(n)for(let c of e.enemies)!c.dead&&c.realm===e.realm&&w(r,c.x,c.y,4/i,4/i,"#a95e4c");return e.waypoint&&(y(r,[[e.waypoint.x-7/i,e.waypoint.y-7/i],[e.waypoint.x+7/i,e.waypoint.y+7/i]],"#a27846",1.5/i),y(r,[[e.waypoint.x+7/i,e.waypoint.y-7/i],[e.waypoint.x-7/i,e.waypoint.y+7/i]],"#a27846",1.5/i)),r.save(),r.translate(e.player.x,e.player.y),r.rotate(e.player.angle+Math.PI/2),r.beginPath(),r.moveTo(0,-6/i),r.lineTo(4/i,5/i),r.lineTo(0,3/i),r.lineTo(-4/i,5/i),r.closePath(),r.fillStyle="#1c5656",r.fill(),r.restore(),r.restore(),n&&(r.font="11px Georgia",r.fillStyle="#667258",r.fillText("N",t-25,23),y(r,[[t-22,29],[t-22,55]],"#667258",1),y(r,[[t-26,34],[t-22,29],[t-18,34]],"#667258",1)),{sc:i,ox:f,oy:m}}};var u=a=>document.getElementById(a),me=a=>String(a).replace(/[&<>"']/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[e]),W=u("game"),k=u("modal"),p=X(),M=!1,$={},Y=null,L=null,fe=0,ee=!0;try{Y=Ce(localStorage.getItem(de))}catch{ee=!1}Y&&(u("continue-btn").hidden=!1,u("start-btn").innerHTML="Nueva traves\xEDa <span>\u2192</span>");var j=new ne(W,u("minimap")),he=class{constructor(){this.enabled=!1,this.ctx=null;try{this.enabled=localStorage.getItem("marea-sound")==="on"}catch{}this.refresh()}refresh(){u("sound-btn").setAttribute("aria-pressed",String(this.enabled)),u("sound-btn").setAttribute("aria-label",this.enabled?"Desactivar sonido":"Activar sonido"),u("sound-btn").title=this.enabled?"Desactivar sonido":"Activar sonido",u("sound-btn").querySelector(".sound-off").hidden=this.enabled}init(){if(this.enabled)try{this.ctx??(this.ctx=new(window.AudioContext||window.webkitAudioContext)),this.ctx.state==="suspended"&&this.ctx.resume().catch(()=>{})}catch{this.enabled=!1,this.refresh()}}play(e){if(!this.enabled||(this.init(),!this.ctx))return;let o=this.ctx,n=o.currentTime,r=(d,i,f,m="sine",l=.05)=>{let c=o.createOscillator(),h=o.createGain();c.type=m,c.frequency.setValueAtTime(d,n+i),h.gain.setValueAtTime(0,n+i),h.gain.linearRampToValueAtTime(l,n+i+.015),h.gain.exponentialRampToValueAtTime(.001,n+i+f),c.connect(h),h.connect(o.destination),c.start(n+i),c.stop(n+i+f+.03)};if(e==="cannon"||e==="hit"||e==="sunk"){let d=e==="cannon"?.25:e==="sunk"?.55:.12,i=o.createBuffer(1,o.sampleRate*d,o.sampleRate),f=i.getChannelData(0);for(let h=0;h<f.length;h++)f[h]=(Math.random()*2-1)*(1-h/f.length)**3;let m=o.createBufferSource(),l=o.createBiquadFilter(),c=o.createGain();m.buffer=i,l.type="lowpass",l.frequency.value=e==="cannon"?520:1100,c.gain.value=.11,m.connect(l),l.connect(c),c.connect(o.destination),m.start(),r(e==="cannon"?70:110,0,d,"sine",.06);return}({coin:[660,880],treasure:[330,440,554,660,880],discovery:[392,494,587],realm:[220,330,440,554],boost:[180,260],boss:[110,130,147],victory:[330,440,554,660,554,660,880]}[e]||[440]).forEach((d,i)=>r(d,i*.1,.55,"sine",.045))}},I=new he;function C(){if(M){try{localStorage.setItem(de,Te(p)),ee=!0,u("save-status").innerHTML="<i></i> Traves\xEDa guardada"}catch{ee=!1,u("save-status").textContent="Guardado no disponible"}p.autosave=0}}function D(a,e="info"){let o=document.createElement("div");for(o.className=`toast ${e}`,o.textContent=a,u("toasts").appendChild(o);u("toasts").children.length>3;)u("toasts").firstChild.remove();setTimeout(()=>o.remove(),5200)}function N(){let a=p.events.splice(0);for(let e of a)e.text&&D(e.text,e.type),e.sound&&I.play(e.sound),e.kind==="respawn"&&(j.snap(p.player),C()),e.kind==="victory"&&(C(),je())}function H(a,e,o="MAREA NEGRA",n=""){p.active=!1,$={},L=null,u("modal-title").textContent=a,u("modal-eyebrow").textContent=o,u("modal-body").innerHTML=e,k.className=n,k.open||k.showModal(),u("pause-btn").textContent="\u25B6",u("pause-btn").setAttribute("aria-label","Reanudar juego")}function T(){k.open&&k.close(),L=null,p.active=M,$={},u("pause-btn").textContent="II",u("pause-btn").setAttribute("aria-label","Pausar juego"),M&&W.focus({preventScroll:!0})}function ye(a=!1){p=a&&Y?Y:X(),M=!0,p.active=!0,Y=null,u("intro-overlay").hidden=!0,j.snap(p.player),I.init(),C(),G(),W.focus({preventScroll:!0}),D(a?"Bienvenido a bordo, capit\xE1n. Tu traves\xEDa contin\xFAa.":"Rumbo al noreste: la Isla del Sol guarda la primera reliquia."),ee||D("El navegador no permite guardar. Mant\xE9n esta pesta\xF1a abierta para conservar tu traves\xEDa.","danger")}function Re(){H("Una nueva historia",'<p>Empezar\xE1s de nuevo en Puerto Bruma. Se reemplazar\xE1 la traves\xEDa guardada, incluidas sus reliquias y mejoras.</p><div class="modal-actions"><button class="secondary-button" id="cancel-new">Conservar mi traves\xEDa</button><button class="primary-button" id="confirm-new">Empezar de nuevo <span>\u2192</span></button></div>',"NUEVA TRAVES\xCDA"),u("cancel-new").onclick=T,u("confirm-new").onclick=()=>{T(),ye(!1)}}function G(){let a=p.player;u("hp-label").textContent=`${Math.ceil(a.hp)} / ${a.maxHp}`,u("hp-bar").style.width=`${a.hp/a.maxHp*100}%`,u("hp-bar").style.background=a.hp/a.maxHp<.3?"#b9735b":"#688d75",u("gold-label").textContent=a.gold,u("sunk-label").textContent=p.sunk,u("islands-label").textContent=`${p.discovered.length} / 8`,u("quest-count").textContent=`${p.relics.length} / 3`,u("ship-level").textContent=`NIV. ${1+Object.values(p.upgrades).reduce((t,d)=>t+d,0)}`;for(let t of document.querySelectorAll("[data-relic]"))t.classList.toggle("done",p.relics.includes(t.dataset.relic));let e=p.realm==="spectral";u("realm-label").textContent=e?"Mar espectral":"Mar de los vivos",u("world-name").textContent=e?"AL OTRO LADO DEL VELO":"MAR DE LOS VIVOS",u("world-desc").textContent=e?"No todas las leyendas descansan en paz":"La calma nunca es para siempre",u("world-icon").textContent=e?"\u263E":"\u2600",u("energy-bar").style.width=`${a.energy}%`,u("energy-bar").style.background=e?"#c6afd9":"#b1cfb3",u("energy-label").textContent=e?`${Math.ceil(a.energy/4)} s al otro lado`:a.energy<22?"Recuperando la br\xFAjula\u2026":"Listo para cruzar",u("realm-btn").style.background=e?"#726187b0":"";let o=ce(p);u("region-label").textContent=g(a,o)<o.r+400?o.name:"Mar abierto",u("coordinates").textContent=`${18+Math.floor(a.y/450)}\xB0 ${String(Math.floor(a.y/7)%60).padStart(2,"0")}\u2032 N   ${64+Math.floor(a.x/550)}\xB0 ${String(Math.floor(a.x/9)%60).padStart(2,"0")}\u2032 O`;let n=J(p);u("target-text").innerHTML=`${me(n.name)}<small>${n.custom?"Tu rumbo":p.won?"De vuelta a casa":p.relics.length<3?"Pr\xF3xima reliquia":"El \xFAltimo desaf\xEDo"}</small>`,u("target-distance").textContent=`${Math.round(g(a,n))} m`;let r=te(p);u("interact-prompt").hidden=!M||!r||k.open,r&&(u("interact-prompt").querySelector("span").textContent=r.kind==="port"?"Atracar en el astillero":r.kind==="rift"?"Investigar el abismo":p.looted.includes(r.id)?"Visitar la isla":"Desembarcar y explorar"),u("quest-tip").querySelector("p").textContent=p.won?"El mar es libre. Tu nombre ya es leyenda.":p.relics.length===3?"Cruza el velo en la Boca del Abismo.":p.relics.includes("sun")&&!p.relics.includes("moon")?"Pulsa Q cerca de Velo de Luna para revelar su reliquia.":"Tu br\xFAjula se\xF1ala la pr\xF3xima reliquia.",u("touch-boost").disabled=a.boostCooldown>0,u("touch-boost").textContent=a.boostCooldown>0?Math.ceil(a.boostCooldown):"\u27A4",L&&j.drawMap(p,L,!0)}function le(){H("El mar es tuyo.",'<p>Recupera las reliquias del Sol, la Luna y la Marea. Ll\xE9valas a la Boca del Abismo, cruza el velo e invoca al Almirante Hueco para liberar los dos mares.</p><div class="control-grid"><div><kbd>WASD / \u2191\u2193\u2190\u2192</kbd> Navegar</div><div><kbd>ESPACIO</kbd> Disparar al rival cercano</div><div><kbd>CLIC</kbd> Apuntar y disparar</div><div><kbd>SHIFT</kbd> Impulso \xB7 recarga 6 s</div><div><kbd>Q</kbd> Alternar los dos mundos</div><div><kbd>E</kbd> Explorar o atracar</div><div><kbd>M</kbd> Carta n\xE1utica</div><div><kbd>ESC</kbd> Pausar / reanudar</div></div><p class="modal-note">En m\xF3vil, usa las flechas y los botones sobre el mar. Toca la luna para cruzar el velo y el aviso de la costa para desembarcar.</p><p><strong>El velo:</strong> dura hasta 25 segundos. Su energ\xEDa se recupera en el mundo real. Solo puedes atacar y recibir ataques de barcos en tu mismo mundo.</p><p><strong>Puertos:</strong> reparan gratis y ofrecen mejores ca\xF1ones, casco y velas. Si naufragas, pierdes el 15 % de tus doblones y vuelves al puerto conservando tus reliquias y mejoras.</p><p><strong>Tu br\xFAjula:</strong> sigue el objetivo de la campa\xF1a. En el mapa puedes marcar otro rumbo. La tormenta da\xF1a el casco, pero no te alcanza en el mar espectral.</p><button class="primary-button" id="help-done">Entendido, capit\xE1n <span>\u2192</span></button>',"MANUAL DE NAVEGACI\xD3N"),u("help-done").onclick=T}function be(){H("Archipi\xE9lago de las \xC1nimas",'<canvas id="large-map" class="big-map" width="1000" height="730" aria-label="Mapa del archipi\xE9lago. Toca una ubicaci\xF3n para marcar el rumbo."></canvas><div class="map-legend"><span>\u25B2 La Peregrina</span><span>\u2693 Puerto seguro</span><span>\u2727 Reliquia</span><span>\u25CF Nav\xEDo hostil</span></div><p class="map-help">Toca el mapa para marcar tu rumbo. Las costas tenues a\xFAn est\xE1n por descubrir.</p><div class="modal-actions"><button class="secondary-button" id="clear-waypoint">Seguir la misi\xF3n</button><button class="primary-button" id="map-done">Volver al mar <span>\u2192</span></button></div>',"CARTA N\xC1UTICA","map-dialog"),L=u("large-map");let a=j.drawMap(p,L,!0);L.onclick=e=>{let o=L.getBoundingClientRect(),n=((e.clientX-o.left)*L.width/o.width-a.ox)/a.sc,r=((e.clientY-o.top)*L.height/o.height-a.oy)/a.sc;n<0||n>v.width||r<0||r>v.height||(p.waypoint={x:n,y:r},T(),D("Rumbo marcado. Sigue la flecha dorada."),C())},u("clear-waypoint").onclick=()=>{p.waypoint=null,j.drawMap(p,L,!0),D("La br\xFAjula vuelve a se\xF1alar tu misi\xF3n."),C()},u("map-done").onclick=T}function Ie(){H("Historias de sal y viento",`<div class="port-balance"><span>${Math.floor(p.time/60)} minutos de traves\xEDa</span><span>${p.discovered.length} de 8 islas descubiertas</span></div>${p.journal.map(a=>`<div class="journal-entry"><span>${String(Math.floor(a.time/60)).padStart(2,"0")}:${String(Math.floor(a.time%60)).padStart(2,"0")}</span><p>${me(a.text)}</p></div>`).join("")}<div class="modal-actions"><button class="primary-button" id="journal-done">Seguir escribiendo mi historia <span>\u2192</span></button></div>`,"BIT\xC1CORA DEL CAPIT\xC1N"),u("journal-done").onclick=T}function ge(){if(!M){le();return}if(!_(p)){let e=R.filter(o=>o.kind==="port").sort((o,n)=>g(o,p.player)-g(n,p.player));p.waypoint={x:e[0].x,y:e[0].y},D(`Pon rumbo a ${e[0].name} para reparar o mejorar. El puerto est\xE1 marcado.`),C();return}let a=[{key:"hull",name:"Casco reforzado",desc:"+50 puntos de integridad por nivel."},{key:"cannons",name:"Bater\xEDa de ca\xF1ones",desc:"M\xE1s da\xF1o, mejor recarga y hasta 3 proyectiles."},{key:"sails",name:"Velas de contrabandista",desc:"+25 de velocidad por nivel. El viento es tu aliado."}];H(te(p)?.name||"Astillero",`<div class="port-balance"><span>ASTILLERO \xB7 PUERTO SEGURO</span><strong>\u25C8 ${p.player.gold} doblones</strong></div><p>Un barco cuidado siempre encuentra el camino de vuelta. Aqu\xED las reparaciones corren por nuestra cuenta.</p><div class="upgrade-list">${a.map(e=>{let o=p.upgrades[e.key],n=ue(p,e.key);return`<div class="upgrade-item"><div><h3>${e.name}</h3><p>${e.desc}<br>Nivel ${o} / 3</p></div><button data-upgrade="${e.key}" ${o>=3||p.player.gold<n?"disabled":""}>${o>=3?"Al m\xE1ximo":`\u25C8 ${n} \xB7 Mejorar`}</button></div>`}).join("")}</div><div class="modal-actions"><button class="secondary-button" id="repair-btn">\u2693 Reparar gratis</button><button class="primary-button" id="leave-port">Volver a navegar <span>\u2192</span></button></div>`,"EL HOGAR DE LA PEREGRINA");for(let e of document.querySelectorAll("[data-upgrade]"))e.onclick=()=>{Me(p,e.dataset.upgrade)&&(C(),G(),ge(),N())};u("repair-btn").onclick=()=>{Ae(p),C(),G(),N(),u("repair-btn").textContent="\u2713 Barco reparado"},u("leave-port").onclick=T}function Le(){if(!M||k.open)return;let a=ke(p);if(N(),!!a){if(C(),G(),a.kind==="port"){ge();return}a.kind!=="boss"&&(H(a.title,`<div class="modal-art ${a.island.realm==="spectral"?"spectral":""}">${a.island.glyph||"\u25C8"}</div><p>${me(a.text)}</p>${a.amount?`<p class="modal-note">+${a.amount} doblones${a.island.kind==="relic"?` \xB7 Reliquias recuperadas: ${p.relics.length} / 3`:""}</p>`:""}${p.relics.length===3&&!p.bossAwake?"<p>La br\xFAjula gira hacia la Boca del Abismo. Abre la carta n\xE1utica y prep\xE1rate para el \xFAltimo viaje.</p>":""}<button class="primary-button" id="story-done">El horizonte me espera <span>\u2192</span></button>`,a.island.name.toUpperCase()),u("story-done").onclick=T)}}function ie(){M&&(H("El mar puede esperar.",'<div class="pause-copy"><div class="modal-art">\u2693</div><p>Tu tripulaci\xF3n guarda el rumbo.<br>La traves\xEDa est\xE1 pausada y tu progreso, guardado en este navegador.</p></div><button class="primary-button" id="resume-btn">Volver a bordo <span>\u2192</span></button><div class="modal-actions"><button class="secondary-button" id="pause-help">C\xF3mo jugar</button><button class="secondary-button" id="new-game-btn">Nueva traves\xEDa</button></div>',"UN RESPIRO EN ALTA MAR"),C(),ee||(u("modal-body").querySelector(".pause-copy p").textContent="La traves\xEDa est\xE1 pausada. El guardado no est\xE1 disponible en este navegador."),u("resume-btn").onclick=T,u("pause-help").onclick=le,u("new-game-btn").onclick=Re)}function je(){H("Ahora eres leyenda.",`<div class="modal-art">\u2727</div><p>El Almirante Hueco se desvanece. Las tres reliquias se unen y el Coraz\xF3n del Abismo vuelve a latir. Por primera vez en siglos, los dos mares respiran en paz.</p><p>En cada puerto contar\xE1n la historia de <strong>La Peregrina</strong> y de su capit\xE1n: aquel que se atrevi\xF3 a navegar m\xE1s all\xE1 del horizonte.</p><div class="summary-grid"><div><strong>${p.sunk}</strong><span>VICTORIAS NAVALES</span></div><div><strong>${p.discovered.length}/8</strong><span>ISLAS DESCUBIERTAS</span></div><div><strong>${Math.floor(p.time/60)} min</strong><span>DE AVENTURA</span></div></div><p class="modal-note">+500 doblones \xB7 Campa\xF1a completada. Puedes seguir explorando y mejorar tu nav\xEDo.</p><button class="primary-button" id="victory-continue">El mar a\xFAn tiene historias <span>\u2192</span></button>`,"EL CORAZ\xD3N DEL ABISMO"),u("victory-continue").onclick=T}u("start-btn").onclick=()=>Y?Re():ye(!1);u("continue-btn").onclick=()=>ye(!0);u("close-modal").onclick=T;k.addEventListener("cancel",a=>{a.preventDefault(),T()});u("map-btn").onclick=be;u("mini-map-btn").onclick=be;u("log-btn").onclick=Ie;u("help-btn").onclick=le;u("controls-help").onclick=le;u("voyage-btn").onclick=()=>{k.open?T():M&&W.focus({preventScroll:!0})};u("pause-btn").onclick=()=>k.open?T():ie();u("port-btn").onclick=ge;u("interact-prompt").onclick=Le;u("realm-btn").onclick=()=>{M&&!k.open&&(oe(p),N(),G())};u("sound-btn").onclick=()=>{I.enabled=!I.enabled,I.refresh(),I.init(),I.play("coin");try{localStorage.setItem("marea-sound",I.enabled?"on":"off")}catch{}};u("fullscreen-btn").onclick=async()=>{try{document.fullscreenElement?await document.exitFullscreen():u("game-frame").requestFullscreen?await u("game-frame").requestFullscreen():D("Tu navegador no admite pantalla completa. Puedes girar el dispositivo.")}catch{D("La pantalla completa no est\xE1 disponible en este navegador.")}};var K={KeyW:"up",ArrowUp:"up",KeyS:"down",ArrowDown:"down",KeyA:"left",ArrowLeft:"left",KeyD:"right",ArrowRight:"right",Space:"fire",ShiftLeft:"boost",ShiftRight:"boost"};document.addEventListener("keydown",a=>{k.open||M&&(K[a.code]&&(a.preventDefault(),$[K[a.code]]=!0,!a.repeat&&K[a.code]==="fire"&&Z(p),!a.repeat&&K[a.code]==="boost"&&re(p)),!a.repeat&&(a.code==="KeyQ"&&(a.preventDefault(),oe(p),N()),a.code==="KeyE"&&(a.preventDefault(),Le()),a.code==="KeyM"&&(a.preventDefault(),be()),a.code==="Escape"&&(a.preventDefault(),ie())))});document.addEventListener("keyup",a=>{K[a.code]&&($[K[a.code]]=!1)});window.addEventListener("blur",()=>{$={},M&&!k.open&&ie()});document.addEventListener("visibilitychange",()=>{document.hidden&&M&&($={},C(),k.open||ie())});window.addEventListener("pagehide",C);W.addEventListener("pointerdown",a=>{if(!M||k.open||a.button!==0)return;W.focus({preventScroll:!0});let e=W.getBoundingClientRect(),o=j.screenToWorld(a.clientX-e.left,a.clientY-e.top);Z(p,o),N()});function Pe(a,e){a.addEventListener("pointerdown",n=>{n.preventDefault(),!(!M||k.open)&&(a.setPointerCapture(n.pointerId),$[e]=!0,e==="fire"&&Z(p))});let o=()=>{$[e]=!1};a.addEventListener("pointerup",o),a.addEventListener("pointercancel",o),a.addEventListener("lostpointercapture",o)}for(let a of document.querySelectorAll("[data-move]"))Pe(a,a.dataset.move);Pe(u("touch-fire"),"fire");u("touch-boost").addEventListener("pointerdown",a=>{a.preventDefault(),M&&!k.open&&(re(p),N())});new ResizeObserver(()=>j.resize()).observe(u("game-frame"));var Ee=performance.now();function qe(a){let e=Math.min((a-Ee)/1e3,.05);Ee=a,Se(p,e,$),N(),j.draw(p,e,!M),fe+=e,fe>.12&&(G(),fe=0),p.autosave>5&&C(),requestAnimationFrame(qe)}G();requestAnimationFrame(qe);})();
+</script>
+  </body>
+</html>
