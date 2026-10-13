@@ -5,6 +5,7 @@ Requisitos opcionales: NumPy y FFmpeg. Primero ejecuta record-demo.mjs.
 """
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import wave
@@ -62,7 +63,11 @@ with wave.open(str(work / "original-score.wav"), "wb") as out:
 
 media = root / "docs/media"
 media.mkdir(parents=True, exist_ok=True)
-output = media / "marea-negra-demo.mp4"
+basename = os.environ.get("DEMO_BASENAME", "marea-negra-demo")
+if not re.fullmatch(r"[a-z0-9-]+", basename):
+    raise ValueError("DEMO_BASENAME debe contener solo letras minúsculas, números o guiones")
+poster = "marea-negra-portada" if basename == "marea-negra-demo" else basename + "-portada"
+output = media / (basename + ".mp4")
 subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(source), "-i", str(work / "original-score.wav"), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", str(output)], check=True)
-subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", str(max(0,duration-3)), "-i", str(output), "-frames:v", "1", "-q:v", "2", str(media / "marea-negra-portada.jpg")], check=True)
+subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", str(max(0,duration-3)), "-i", str(output), "-frames:v", "1", "-q:v", "2", str(media / (poster + ".jpg"))], check=True)
 print(f"Video listo: {output} · {duration:.1f} s · {output.stat().st_size / 1024 / 1024:.1f} MB")

@@ -41,7 +41,10 @@ if (
   );
 }
 await mkdir(resolve(root, "dist"), { recursive: true });
-await writeFile(resolve(root, "dist/marea-negra.html"), html);
+await writeFile(
+  resolve(root, "dist/marea-negra.html"),
+  html.replaceAll('href="./index.html"', 'href="./marea-negra.html"'),
+);
 await mkdir(resolve(root, "docs"), { recursive: true });
 await writeFile(resolve(root, "docs/index.html"), html);
 await writeFile(resolve(root, "docs/.nojekyll"), "");

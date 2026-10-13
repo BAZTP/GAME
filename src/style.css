@@ -2023,3 +2023,82 @@ dialog::backdrop {
 .preview-3d-link:hover {
   background: #d6e2ca;
 }
+
+/* Both adventures expose the same persistent view selector. */
+.topbar .mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: auto;
+  padding: 3px;
+  border: 1px solid #aab8a477;
+  border-radius: 7px;
+  background: #e7ebdf;
+  flex-shrink: 0;
+}
+.mode-switch a {
+  display: block;
+  min-width: 39px;
+  padding: 9px 11px;
+  font:
+    600 11px Arial,
+    sans-serif;
+  text-align: center;
+  text-decoration: none;
+  color: #62776b;
+  border-radius: 4px;
+}
+.mode-switch a[aria-current="page"] {
+  background: #244f4d;
+  color: #fff3cf;
+  box-shadow: 0 1px 3px #173b4022;
+}
+.mode-switch a:hover {
+  background: #d2ddcb;
+  color: #183e3c;
+}
+.mode-switch a:focus-visible {
+  outline: 2px solid #ae9251;
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 56px 44px;
+    height: 110px;
+    gap: 0 8px;
+    padding: 0 14px 10px;
+  }
+  .topbar .brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .topbar .header-end {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .topbar nav[aria-label="Navegación principal"] {
+    grid-column: 1;
+    grid-row: 2;
+    height: 38px;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar .mode-switch {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+  }
+  .topbar .nav-link {
+    font-size: 10px;
+  }
+  .topbar .nav-link kbd {
+    display: none;
+  }
+  .game-frame {
+    height: calc(100svh - 157px);
+  }
+}

@@ -651,3 +651,8 @@ function frame(now) {
 }
 refreshUI();
 requestAnimationFrame(frame);
+
+// Selecting the active view keeps the current voyage running.
+document
+  .querySelector('.mode-switch [aria-current="page"]')
+  .addEventListener("click", (event) => event.preventDefault());

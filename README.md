@@ -127,8 +127,16 @@ En dispositivos táctiles aparecen flechas de navegación, disparo e impulso. Lo
 
 La campaña es para **un jugador**. No incluye multijugador ni publicación automática. Las pruebas del final cargan estados de partida controlados para verificar la interfaz, además de recorrer la progresión en las pruebas de simulación.
 
-## Video para YouTube y Facebook
+## Selector de vista y video corto 2D / 3D
 
-La página `docs/video.html` reproduce y permite descargar **`docs/media/marea-negra-demo.mp4`**. Es una demostración horizontal 16:9, de 1280 × 720 píxeles, con textos en español y una banda sonora sintetizada original. La portada y un texto sugerido para publicar están en `docs/media/`.
+Ambas barras superiores tienen un selector **2D / 3D**, con la vista activa resaltada. Al salir del 2D se guarda la travesía; al volver puedes continuarla. Pulsar la vista activa no recarga el juego. La expedición 3D se reinicia al abandonarla y no modifica el progreso de la campaña 2D.
+
+`docs/video.html` presenta el nuevo video horizontal `docs/media/marea-negra-2d-3d.mp4`, con gameplay de ambas vistas, rótulos en español y música original. Permite reproducirlo y descargarlo para YouTube o Facebook. Conserva un enlace al tutorial anterior de la flota. Las instrucciones de grabación y un texto para publicar están en `docs/media/PUBLICAR.md`.
+
+`npm run test:modes` comprueba el cambio entre vistas, el guardado y el diseño de ambas barras en siete anchuras de pantalla, además de los enlaces de la versión portátil.
+
+## Tutorial anterior para YouTube y Facebook
+
+La página `docs/video.html` también enlaza el tutorial anterior **`docs/media/marea-negra-demo.mp4`**. Es una demostración horizontal 16:9, de 1280 × 720 píxeles, con textos en español y una banda sonora sintetizada original. La portada y un texto sugerido para publicar están en `docs/media/`.
 
 El video utiliza gameplay real con partidas de demostración preparadas y controles reales. No tiene voz en off. Consulta `docs/media/PUBLICAR.md` para reproducir la grabación con Playwright y FFmpeg; la generación de audio requiere NumPy. Estas herramientas audiovisuales son opcionales y no se necesitan para jugar ni ejecutar las pruebas del juego.

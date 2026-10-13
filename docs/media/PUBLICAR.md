@@ -1,3 +1,31 @@
+# Video corto: Marea Negra en 2D y 3D
+
+- Video horizontal nuevo: `marea-negra-2d-3d.mp4` (1280 × 720, H.264/AAC, 30 fps).
+- Portada: `marea-negra-2d-3d-portada.jpg`.
+- Ver y descargar: https://baztp.github.io/GAME/video.html
+- Jugar y elegir vista: https://baztp.github.io/GAME/
+
+Muestra el selector de la barra, navegación y combate en 2D, el cambio real al 3D y la cámara detrás del barco. Textos en español y música sintetizada original, sin voz en off. El 2D usa partidas de demostración; el 3D se graba desde una expedición nueva con controles reales.
+
+**Título sugerido:** Marea Negra: elige tu aventura en 2D o 3D 🏴‍☠️
+
+**Texto para publicar:** ¡Dos formas de surcar el mar! Explora la campaña 2D o toma el timón en nuestra primera expedición 3D. Elige tu vista en la barra superior, combate a los corsarios y navega entre islas. Juega gratis desde tu navegador: https://baztp.github.io/GAME/
+
+#MareaNegra #JuegoPirata #JuegosIndie #Gameplay #2D #3D
+
+## Reproducir el video nuevo
+
+Con `npm start` ejecutándose:
+
+```sh
+npm run video:modes
+DEMO_WORK_DIR=/tmp/marea-modes DEMO_BASENAME=marea-negra-2d-3d python3 scripts/finish-demo.py
+```
+
+Requiere Chromium, Playwright, FFmpeg y NumPy. Los clips y fotogramas intermedios se guardan en `/tmp/marea-modes`. `MODES_WORK_DIR` cambia esa carpeta y `MODES_SCENES` permite volver a grabar clips concretos. Las acciones del juego se conservan; se adapta el encuadre y se añaden rótulos para facilitar la lectura del video.
+
+---
+
 # Video de Marea Negra
 
 - Archivo para YouTube y Facebook: `marea-negra-demo.mp4`.
