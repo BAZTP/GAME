@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#112830" />
+    <meta
+      name="description"
+      content="Descubre cómo jugar a Marea Negra: cuatro barcos, combate naval, rescates y un mar espectral."
+    />
+    <title>Cómo jugar — Marea Negra</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #112830;
+        color: #efe7ce;
+        font:
+          16px Arial,
+          sans-serif;
+      }
+      main {
+        max-width: 1120px;
+        margin: auto;
+        padding: 42px 24px 50px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: center;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #d1bc8033;
+      }
+      .brand {
+        font:
+          25px Georgia,
+          serif;
+        letter-spacing: 3px;
+      }
+      a {
+        color: #d9bf80;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .eyebrow {
+        font-size: 10px;
+        letter-spacing: 3px;
+        color: #bba97a;
+        margin-top: 38px;
+      }
+      h1 {
+        font:
+          clamp(36px, 6vw, 62px) Georgia,
+          serif;
+        letter-spacing: -1px;
+        margin: 16px 0;
+      }
+      p {
+        color: #b9cbbb;
+        line-height: 1.8;
+        max-width: 730px;
+      }
+      video {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #071c25;
+        border: 1px solid #d9bd8344;
+        border-radius: 8px;
+        margin: 28px 0;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+      .button {
+        display: inline-block;
+        background: #d7bd82;
+        color: #172f34;
+        padding: 16px 23px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .button.secondary {
+        background: transparent;
+        border: 1px solid #d7bd8277;
+        color: #dfc795;
+      }
+      .details {
+        font-size: 12px;
+        margin-top: 26px;
+      }
+      .chapters {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 35px 0;
+      }
+      .chapters div {
+        padding: 18px;
+        border: 1px solid #d1bc802b;
+        border-radius: 5px;
+        color: #c6d4bf;
+        font-size: 13px;
+      }
+      .chapters strong {
+        display: block;
+        font: 21px Georgia;
+        color: #eee2c0;
+        margin-bottom: 9px;
+      }
+      footer {
+        border-top: 1px solid #d1bc802b;
+        margin-top: 38px;
+        padding-top: 20px;
+        font-size: 11px;
+        color: #8ba598;
+      }
+      @media (max-width: 650px) {
+        main {
+          padding: 25px 17px;
+        }
+        .brand {
+          font-size: 18px;
+        }
+        .chapters {
+          grid-template-columns: 1fr 1fr;
+        }
+        .actions a {
+          width: 100%;
+          text-align: center;
+        }
+        header a {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand">MAREA NEGRA</div>
+        <a href="./index.html">Volver al juego →</a>
+      </header>
+      <div class="eyebrow">ECOS DEL ABISMO · LA NUEVA FLOTA</div>
+      <h1>Aprende a conquistar el mar.</h1>
+      <p>
+        Un recorrido por la aventura: elige tu navío, domina sus habilidades,
+        rescata náufragos y cruza el velo para encontrar tesoros olvidados.
+      </p>
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        poster="media/marea-negra-portada.jpg"
+        aria-label="Video de demostración de Marea Negra con instrucciones en español"
+      >
+        <source src="media/marea-negra-demo.mp4" type="video/mp4" />
+        Tu navegador no puede reproducir este video. Usa el enlace de descarga.
+      </video>
+      <div class="actions">
+        <a class="button" href="./index.html">Jugar ahora →</a
+        ><a
+          class="button secondary"
+          href="media/marea-negra-demo.mp4"
+          download="Marea-Negra-Demo.mp4"
+          >Descargar video MP4 ↓</a
+        >
+      </div>
+      <div class="chapters">
+        <div><strong>01 · Explora</strong>Navega con WASD o las flechas.</div>
+        <div>
+          <strong>02 · Elige</strong>Cuatro barcos con estilos diferentes.
+        </div>
+        <div>
+          <strong>03 · Combate</strong>Espacio dispara. F activa tu habilidad.
+        </div>
+        <div>
+          <strong>04 · Cruza</strong>Q abre el velo. E descubre sus secretos.
+        </div>
+        <div>
+          <strong>05 · Progresa</strong>Cobra los contratos en los puertos.
+        </div>
+        <div>
+          <strong>06 · Desafía</strong>Recupera las reliquias y enfrenta al
+          guardián.
+        </div>
+      </div>
+      <p class="details">
+        Formato horizontal 16:9 · 1280 × 720 · MP4 H.264 · Textos en español y
+        música instrumental original. Listo para compartir en YouTube y
+        Facebook.
+      </p>
+      <footer>
+        Gameplay real grabado con partidas de demostración preparadas. La música
+        y las ilustraciones se crearon para este proyecto.
+      </footer>
+    </main>
+  </body>
+</html>

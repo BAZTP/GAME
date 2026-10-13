@@ -115,6 +115,37 @@ try {
     s.player.y = i.y + i.r + 65;
     return s;
   }
+  const fleetState = initialState();
+  fleetState.player.gold = 2000;
+  fleetState.relics = ["sun", "moon"];
+  fleetState.sunk = 4;
+  await fixture(fleetState);
+  await page.click("#fleet-btn");
+  await page.click('[data-ship="brig"]');
+  await page.click('[data-ship="galleon"]');
+  await page.click('[data-ship="phantom"]');
+  assert.equal(await page.locator("#ship-name").textContent(), "Alma Errante");
+  await page.screenshot({ path: "test-results/fleet.png", fullPage: true });
+  await page.click('[data-port-tab="contracts"]');
+  await page.click('[data-contract="hunter"]');
+  assert.ok(await page.locator('[data-contract="hunter"]').isDisabled());
+  assert.equal(await page.locator("#gold-label").textContent(), "950");
+  await page.click("#contracts-done");
+  await page.keyboard.press("KeyF");
+  await page.waitForTimeout(150);
+  assert.equal(
+    await page.locator("#realm-label").textContent(),
+    "Mar espectral",
+  );
+  assert.ok(await page.locator("#ability-btn").isDisabled());
+  await page.keyboard.press("Escape");
+  await page.reload();
+  await page.click("#continue-btn");
+  assert.equal(await page.locator("#ship-name").textContent(), "Alma Errante");
+  assert.equal(await page.locator("#gold-label").textContent(), "950");
+  console.log(
+    "PASS flota: compra y cambio de barcos, contratos, habilidad F y persistencia.",
+  );
   await fixture(atIsland("sun"));
   await page.keyboard.press("KeyE");
   assert.equal(
@@ -246,15 +277,51 @@ try {
   await portable.click("#start-btn");
   await portable.keyboard.press("KeyQ");
   await portable.waitForTimeout(180);
-  assert.equal(await portable.locator("#realm-label").textContent(), "Mar espectral");
+  assert.equal(
+    await portable.locator("#realm-label").textContent(),
+    "Mar espectral",
+  );
   await portable.keyboard.press("Escape");
   await offline.setOffline(false);
   await portable.reload();
   assert.ok(await portable.locator("#continue-btn").isVisible());
   await portable.click("#continue-btn");
-  assert.equal(await portable.locator("#realm-label").textContent(), "Mar espectral");
-  console.log("PASS HTML portátil: juego y guardado sin conexión; restauración al recargar por HTTP.");
+  assert.equal(
+    await portable.locator("#realm-label").textContent(),
+    "Mar espectral",
+  );
+  console.log(
+    "PASS HTML portátil: juego y guardado sin conexión; restauración al recargar por HTTP.",
+  );
   assert.deepEqual(errors, []);
+  const watch = await desktop.newPage();
+  watch.on("pageerror", (error) => errors.push(error.message));
+  await watch.goto(`${baseURL}/docs/video.html`);
+  await watch.evaluate(async () => {
+    const video = document.querySelector("video");
+    video.muted = true;
+    await video.play();
+  });
+  await watch.waitForTimeout(1300);
+  const playback = await watch.evaluate(() => {
+    const video = document.querySelector("video");
+    return {
+      time: video.currentTime,
+      duration: video.duration,
+      width: video.videoWidth,
+      height: video.videoHeight,
+      error: video.error?.message,
+    };
+  });
+  assert.ok(playback.time > 0.5);
+  assert.ok(playback.duration > 35 && playback.duration < 65);
+  assert.equal(playback.width, 1280);
+  assert.equal(playback.height, 720);
+  assert.equal(playback.error, undefined);
+  assert.deepEqual(errors, []);
+  console.log(
+    "PASS video: página de reproducción y MP4 horizontal reproducidos en Chromium.",
+  );
   console.log("PASS cero errores JavaScript del navegador.");
 } finally {
   if (browser) await browser.close();

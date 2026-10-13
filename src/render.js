@@ -1,4 +1,5 @@
 import { ISLANDS, WORLD, dist, random, nextTarget, clamp } from "./game.js";
+import { SHIPS, ENEMY_TYPES, RESCUES } from "./content.js";
 
 const TAU = Math.PI * 2;
 function line(ctx, points, color, width = 1) {
@@ -528,6 +529,54 @@ export class Renderer {
       c.fillStyle = "#ead9a1";
       c.fillText("+" + item.amount, item.x, y - 13);
     }
+    if (!sp)
+      for (const rescue of RESCUES) {
+        if (s.rescued.includes(rescue.id)) continue;
+        const bob = Math.sin(t * 2 + rescue.x) * 3;
+        c.save();
+        c.translate(rescue.x, rescue.y + bob);
+        ellipse(c, 0, 10, 21, 8, "#123b4260");
+        for (let n = -2; n <= 2; n++) {
+          c.fillStyle = n % 2 ? "#9f8458" : "#c3a56c";
+          c.fillRect(n * 7 - 3, -10, 6, 27);
+        }
+        line(
+          c,
+          [
+            [-18, -4],
+            [18, -4],
+          ],
+          "#5a614a",
+          2,
+        );
+        line(
+          c,
+          [
+            [-18, 10],
+            [18, 10],
+          ],
+          "#5a614a",
+          2,
+        );
+        ellipse(c, 0, -2, 4, 4, "#e3bd8d");
+        line(
+          c,
+          [
+            [0, 2],
+            [0, 8],
+            [7, 4],
+          ],
+          "#d7cead",
+          3,
+        );
+        c.font = "17px Georgia";
+        c.textAlign = "center";
+        c.fillStyle = "#f1d494";
+        c.fillText("!", 0, -22);
+        c.font = "8px Arial";
+        c.fillText("NÁUFRAGO", 0, 37);
+        c.restore();
+      }
     for (const e of s.enemies) {
       if (e.dead) continue;
       if (e.realm !== s.realm) {
@@ -546,10 +595,19 @@ export class Renderer {
           c.font = "10px Georgia";
           c.textAlign = "center";
           c.fillText("EL ALMIRANTE HUECO", e.x, e.y - 70);
+        } else {
+          c.fillStyle = "#d9c9b4";
+          c.font = "8px Arial";
+          c.textAlign = "center";
+          c.fillText(
+            (ENEMY_TYPES[e.type] || ENEMY_TYPES.raider).name,
+            e.x,
+            e.y - 68,
+          );
         }
       }
     }
-    this.ship(c, { ...s.player, realm: s.realm }, t, true);
+    this.ship(c, { ...s.player, realm: s.realm, shipId: s.shipId }, t, true);
     for (const b of s.bullets) {
       if (b.realm !== s.realm) continue;
       line(
@@ -705,8 +763,20 @@ export class Renderer {
     c.save();
     c.translate(e.x, e.y);
     c.rotate(e.angle + Math.PI / 2);
-    const scale = e.boss ? 1.8 : player ? 1 : 0.92;
+    const profile = player
+      ? SHIPS[e.shipId] || SHIPS.sloop
+      : ENEMY_TYPES[e.type] || ENEMY_TYPES.raider;
+    const scale = e.boss ? 1.8 : profile.scale;
     c.scale(scale, scale);
+    if (player && e.shield > 0) {
+      c.beginPath();
+      c.ellipse(0, 0, 42, 62, 0, 0, TAU);
+      c.fillStyle = "#ead49118";
+      c.fill();
+      c.strokeStyle = "#f4d997aa";
+      c.lineWidth = 2;
+      c.stroke();
+    }
     if (ghost) c.globalAlpha = 0.12;
     else if (player && e.invulnerable > 0)
       c.globalAlpha = 0.65 + Math.sin(t * 20) * 0.25;
@@ -765,8 +835,8 @@ export class Renderer {
         : spectral
           ? "#c4d4d5"
           : player
-            ? "#e9dfbc"
-            : "#a96c56";
+            ? profile.color
+            : profile.color;
     c.fill();
     c.strokeStyle = spectral ? "#e0ddec" : "#f3e8c84f";
     c.lineWidth = 1;
@@ -797,6 +867,44 @@ export class Renderer {
     c.closePath();
     c.fillStyle = spectral ? "#a8bdc4" : player ? "#d8ccaa" : "#955c4c";
     c.fill();
+    if (
+      (player && e.shipId !== "sloop") ||
+      (!player && ["brig", "dreadnought"].includes(e.type)) ||
+      e.boss
+    ) {
+      const mastY =
+        e.shipId === "galleon" || e.type === "dreadnought" || e.boss
+          ? [-31, 24]
+          : [-29];
+      for (const y of mastY) {
+        line(
+          c,
+          [
+            [-19, y],
+            [19, y],
+          ],
+          "#d0bc86",
+          2,
+        );
+        c.beginPath();
+        c.moveTo(-19, y);
+        c.quadraticCurveTo(0, y + 7, 19, y);
+        c.lineTo(16, y + 14);
+        c.quadraticCurveTo(0, y + 19, -16, y + 14);
+        c.closePath();
+        c.fillStyle = spectral ? "#d0c8e5" : profile.color;
+        c.fill();
+        line(
+          c,
+          [
+            [0, y],
+            [0, y + 17],
+          ],
+          "#65776b77",
+          1,
+        );
+      }
+    }
     if (player) {
       c.strokeStyle = "#677060";
       c.lineWidth = 1.2;
@@ -988,6 +1096,14 @@ export class Renderer {
       }
       c.restore();
     }
+    if (large)
+      for (const rescue of RESCUES) {
+        if (s.rescued.includes(rescue.id)) continue;
+        c.textAlign = "center";
+        c.font = `${12 / sc}px Arial`;
+        c.fillStyle = "#98653d";
+        c.fillText("!", rescue.x, rescue.y);
+      }
     if (large)
       for (const e of s.enemies)
         if (!e.dead && e.realm === s.realm) {

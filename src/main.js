@@ -19,8 +19,14 @@ import {
   SAVE_KEY,
   ISLANDS,
   WORLD,
+  currentShip,
+  selectShip,
+  claimContract,
+  progress,
+  special,
 } from "./game.js";
 import { Renderer } from "./render.js";
+import { SHIPS, CONTRACTS, ACHIEVEMENTS } from "./content.js";
 
 const $ = (id) => document.getElementById(id);
 const escape = (text) =>
@@ -231,6 +237,16 @@ function confirmNew() {
 
 function refreshUI() {
   const p = state.player;
+  const ship = currentShip(state);
+  $("ship-name").textContent = ship.name;
+  $("ship-type").textContent = ship.type;
+  $("ability-name").textContent = ship.ability;
+  $("ability-cooldown").textContent =
+    p.specialCooldown > 0 ? `${Math.ceil(p.specialCooldown)} s` : "Lista";
+  $("ability-btn").disabled = !started || p.specialCooldown > 0;
+  $("ability-btn").title =
+    `${ship.abilityText} Recarga: ${ship.cooldown} s. Tecla F.`;
+  $("contract-ready").textContent = `${state.claimedContracts.length} / 4`;
   $("hp-label").textContent = `${Math.ceil(p.hp)} / ${p.maxHp}`;
   $("hp-bar").style.width = `${(p.hp / p.maxHp) * 100}%`;
   $("hp-bar").style.background = p.hp / p.maxHp < 0.3 ? "#b9735b" : "#688d75";
@@ -254,7 +270,7 @@ function refreshUI() {
   $("energy-bar").style.width = `${p.energy}%`;
   $("energy-bar").style.background = sp ? "#c6afd9" : "#b1cfb3";
   $("energy-label").textContent = sp
-    ? `${Math.ceil(p.energy / 4)} s al otro lado`
+    ? `${Math.ceil(p.energy / (state.shipId === "phantom" ? 2.6 : 4))} s al otro lado`
     : p.energy < 22
       ? "Recuperando la brújula…"
       : "Listo para cruzar";
@@ -295,7 +311,7 @@ function refreshUI() {
 function showHelp() {
   openModal(
     "El mar es tuyo.",
-    `<p>Recupera las reliquias del Sol, la Luna y la Marea. Llévalas a la Boca del Abismo, cruza el velo e invoca al Almirante Hueco para liberar los dos mares.</p><div class="control-grid"><div><kbd>WASD / ↑↓←→</kbd> Navegar</div><div><kbd>ESPACIO</kbd> Disparar al rival cercano</div><div><kbd>CLIC</kbd> Apuntar y disparar</div><div><kbd>SHIFT</kbd> Impulso · recarga 6 s</div><div><kbd>Q</kbd> Alternar los dos mundos</div><div><kbd>E</kbd> Explorar o atracar</div><div><kbd>M</kbd> Carta náutica</div><div><kbd>ESC</kbd> Pausar / reanudar</div></div><p class="modal-note">En móvil, usa las flechas y los botones sobre el mar. Toca la luna para cruzar el velo y el aviso de la costa para desembarcar.</p><p><strong>El velo:</strong> dura hasta 25 segundos. Su energía se recupera en el mundo real. Solo puedes atacar y recibir ataques de barcos en tu mismo mundo.</p><p><strong>Puertos:</strong> reparan gratis y ofrecen mejores cañones, casco y velas. Si naufragas, pierdes el 15 % de tus doblones y vuelves al puerto conservando tus reliquias y mejoras.</p><p><strong>Tu brújula:</strong> sigue el objetivo de la campaña. En el mapa puedes marcar otro rumbo. La tormenta daña el casco, pero no te alcanza en el mar espectral.</p><button class="primary-button" id="help-done">Entendido, capitán <span>→</span></button>`,
+    `<p>Recupera las reliquias del Sol, la Luna y la Marea. Llévalas a la Boca del Abismo, cruza el velo e invoca al Almirante Hueco para liberar los dos mares.</p><div class="control-grid"><div><kbd>WASD / ↑↓←→</kbd> Navegar</div><div><kbd>ESPACIO</kbd> Disparar al rival cercano</div><div><kbd>CLIC</kbd> Apuntar y disparar</div><div><kbd>SHIFT</kbd> Impulso · recarga 6 s</div><div><kbd>Q</kbd> Alternar los dos mundos</div><div><kbd>F</kbd> Habilidad del navío</div><div><kbd>E</kbd> Explorar o atracar</div><div><kbd>M</kbd> Carta náutica</div><div><kbd>ESC</kbd> Pausar / reanudar</div></div><p class="modal-note">En móvil, usa las flechas y los botones sobre el mar. Toca la luna para cruzar el velo y el aviso de la costa para desembarcar.</p><p><strong>El velo:</strong> dura hasta 25 segundos. Su energía se recupera en el mundo real. Solo puedes atacar y recibir ataques de barcos en tu mismo mundo.</p><p><strong>La nueva flota:</strong> compra barcos en el astillero y activa su habilidad con F o el botón sobre el mar. Los contratos ofrecen recompensas; rescata náufragos acercándote a sus balsas y consulta tus logros en la bitácora.</p><p><strong>Puertos:</strong> reparan gratis y ofrecen mejores cañones, casco y velas. Si naufragas, pierdes el 15 % de tus doblones y vuelves al puerto conservando tus reliquias y mejoras.</p><p><strong>Tu brújula:</strong> sigue el objetivo de la campaña. En el mapa puedes marcar otro rumbo. La tormenta daña el casco, pero no te alcanza en el mar espectral.</p><button class="primary-button" id="help-done">Entendido, capitán <span>→</span></button>`,
     "MANUAL DE NAVEGACIÓN",
   );
   $("help-done").onclick = closeModal;
@@ -303,7 +319,7 @@ function showHelp() {
 function showMap() {
   openModal(
     "Archipiélago de las Ánimas",
-    '<canvas id="large-map" class="big-map" width="1000" height="730" aria-label="Mapa del archipiélago. Toca una ubicación para marcar el rumbo."></canvas><div class="map-legend"><span>▲ La Peregrina</span><span>⚓ Puerto seguro</span><span>✧ Reliquia</span><span>● Navío hostil</span></div><p class="map-help">Toca el mapa para marcar tu rumbo. Las costas tenues aún están por descubrir.</p><div class="modal-actions"><button class="secondary-button" id="clear-waypoint">Seguir la misión</button><button class="primary-button" id="map-done">Volver al mar <span>→</span></button></div>',
+    '<canvas id="large-map" class="big-map" width="1000" height="730" aria-label="Mapa del archipiélago. Toca una ubicación para marcar el rumbo."></canvas><div class="map-legend"><span>▲ Tu navío</span><span>⚓ Puerto seguro</span><span>✧ Reliquia</span><span>● Navío hostil</span></div><p class="map-help">Toca el mapa para marcar tu rumbo. Las costas tenues aún están por descubrir.</p><div class="modal-actions"><button class="secondary-button" id="clear-waypoint">Seguir la misión</button><button class="primary-button" id="map-done">Volver al mar <span>→</span></button></div>',
     "CARTA NÁUTICA",
     "map-dialog",
   );
@@ -340,6 +356,91 @@ function showJournal() {
     "BITÁCORA DEL CAPITÁN",
   );
   $("journal-done").onclick = closeModal;
+  $("modal-body").insertAdjacentHTML(
+    "afterbegin",
+    `<div class="achievement-grid">${ACHIEVEMENTS.map((a) => `<div class="achievement ${state.achievements.includes(a.id) ? "unlocked" : ""}"><span>${a.glyph}</span><strong>${a.title}</strong><small>${state.achievements.includes(a.id) ? "DESBLOQUEADO" : `${Math.min(progress(state, a.metric), a.target)} / ${a.target}`}</small></div>`).join("")}</div>`,
+  );
+}
+function portTabs(active) {
+  return `<div class="port-tabs" role="group" aria-label="Servicios del puerto"><button data-port-tab="upgrades" ${active === "upgrades" ? 'aria-current="page"' : ""}>Astillero</button><button data-port-tab="fleet" ${active === "fleet" ? 'aria-current="page"' : ""}>Flota</button><button data-port-tab="contracts" ${active === "contracts" ? 'aria-current="page"' : ""}>Contratos</button></div>`;
+}
+function bindPortTabs() {
+  for (const b of document.querySelectorAll("[data-port-tab]"))
+    b.onclick = () =>
+      ({ upgrades: showPort, fleet: showFleet, contracts: showContracts })[
+        b.dataset.portTab
+      ]();
+}
+function showFleet() {
+  const docked = started && inPort(state);
+  openModal(
+    "Un barco para cada leyenda",
+    `${portTabs("fleet")}<div class="port-balance"><span>FLOTA PERSONAL · ${state.ownedShips.length} / 4</span><strong>◈ ${state.player.gold} doblones</strong></div>${!docked ? '<p class="modal-note">Atraca en un puerto para comprar o cambiar de barco. Las mejoras del astillero se conservan en toda tu flota.</p>' : "<p>Compra un navío una sola vez y cambia de barco gratis en cualquier puerto. Tus mejoras se conservan.</p>"}<div class="fleet-grid">${Object.values(
+      SHIPS,
+    )
+      .map((ship) => {
+        const owned = state.ownedShips.includes(ship.id),
+          selected = state.shipId === ship.id,
+          locked = state.relics.length < ship.relics;
+        return `<article class="fleet-card ${selected ? "selected" : ""}"><div class="fleet-art"><canvas width="240" height="145" data-ship-preview="${ship.id}" aria-label="${ship.type} ${ship.name}"></canvas><span>${ship.type}</span></div><h3>${ship.name}</h3><p>${ship.description}</p><div class="fleet-stats"><span>♡ ${ship.hp} casco</span><span>➤ ${ship.speed} velocidad</span><span>⌖ ${ship.damage} daño</span></div><div class="fleet-ability"><strong>${ship.glyph} ${ship.ability}</strong><small>${ship.abilityText}</small></div><button data-ship="${ship.id}" ${!docked || selected || (!owned && (locked || state.player.gold < ship.cost)) ? "disabled" : ""}>${selected ? "✓ A bordo" : owned ? "Tomar el timón" : locked ? `Requiere ${ship.relics} reliquias` : `Comprar · ◈ ${ship.cost}`}</button></article>`;
+      })
+      .join(
+        "",
+      )}</div><div class="modal-actions"><button class="primary-button" id="fleet-done">Volver al mar <span>→</span></button></div>`,
+    "LA NUEVA FLOTA",
+    "fleet-dialog",
+  );
+  for (const c of document.querySelectorAll("[data-ship-preview]"))
+    renderer.ship(
+      c.getContext("2d"),
+      {
+        x: 120,
+        y: 76,
+        angle: -Math.PI / 2 - 0.3,
+        realm: c.dataset.shipPreview === "phantom" ? "spectral" : "real",
+        shipId: c.dataset.shipPreview,
+      },
+      0,
+      true,
+    );
+  for (const b of document.querySelectorAll("[data-ship]"))
+    b.onclick = () => {
+      if (selectShip(state, b.dataset.ship)) {
+        save();
+        refreshUI();
+        showFleet();
+        drainEvents();
+      }
+    };
+  $("fleet-done").onclick = closeModal;
+  bindPortTabs();
+}
+function showContracts() {
+  openModal(
+    "El tablón del capitán",
+    `${portTabs("contracts")}<p>Los contratos avanzan mientras exploras. Cobra cada recompensa una vez en cualquier puerto.</p><div class="contract-list">${CONTRACTS.map(
+      (c) => {
+        const value = Math.min(progress(state, c.metric), c.target),
+          claimed = state.claimedContracts.includes(c.id),
+          ready = value >= c.target;
+        return `<article class="contract-card"><div><h3>${c.title}</h3><span>◈ ${c.reward}</span></div><p>${c.description}</p><div class="contract-progress"><div class="meter"><span style="width:${(value / c.target) * 100}%"></span></div><small>${value} / ${c.target}</small></div><button data-contract="${c.id}" ${claimed || !ready || !started || !inPort(state) ? "disabled" : ""}>${claimed ? "✓ Recompensa cobrada" : ready ? (inPort(state) ? "Cobrar recompensa" : "Cobra en un puerto") : "En progreso"}</button></article>`;
+      },
+    ).join(
+      "",
+    )}</div><p class="modal-note">Busca las balsas marcadas con ! en la carta náutica. Acércate en el mundo real para rescatar a los náufragos.</p><button class="primary-button" id="contracts-done">Seguir la aventura <span>→</span></button>`,
+    "MISIONES Y RECOMPENSAS",
+  );
+  for (const b of document.querySelectorAll("[data-contract]"))
+    b.onclick = () => {
+      if (claimContract(state, b.dataset.contract)) {
+        save();
+        refreshUI();
+        showContracts();
+        drainEvents();
+      }
+    };
+  $("contracts-done").onclick = closeModal;
+  bindPortTabs();
 }
 function showPort() {
   if (!started) {
@@ -404,6 +505,8 @@ function showPort() {
     $("repair-btn").textContent = "✓ Barco reparado";
   };
   $("leave-port").onclick = closeModal;
+  $("modal-body").insertAdjacentHTML("afterbegin", portTabs("upgrades"));
+  bindPortTabs();
 }
 function doInteract() {
   if (!started || modal.open) return;
@@ -442,7 +545,7 @@ function showPause() {
 function showVictory() {
   openModal(
     "Ahora eres leyenda.",
-    `<div class="modal-art">✧</div><p>El Almirante Hueco se desvanece. Las tres reliquias se unen y el Corazón del Abismo vuelve a latir. Por primera vez en siglos, los dos mares respiran en paz.</p><p>En cada puerto contarán la historia de <strong>La Peregrina</strong> y de su capitán: aquel que se atrevió a navegar más allá del horizonte.</p><div class="summary-grid"><div><strong>${state.sunk}</strong><span>VICTORIAS NAVALES</span></div><div><strong>${state.discovered.length}/8</strong><span>ISLAS DESCUBIERTAS</span></div><div><strong>${Math.floor(state.time / 60)} min</strong><span>DE AVENTURA</span></div></div><p class="modal-note">+500 doblones · Campaña completada. Puedes seguir explorando y mejorar tu navío.</p><button class="primary-button" id="victory-continue">El mar aún tiene historias <span>→</span></button>`,
+    `<div class="modal-art">✧</div><p>El Almirante Hueco se desvanece. Las tres reliquias se unen y el Corazón del Abismo vuelve a latir. Por primera vez en siglos, los dos mares respiran en paz.</p><p>En cada puerto contarán la historia de <strong>${currentShip(state).name}</strong> y de su capitán: aquel que se atrevió a navegar más allá del horizonte.</p><div class="summary-grid"><div><strong>${state.sunk}</strong><span>VICTORIAS NAVALES</span></div><div><strong>${state.discovered.length}/8</strong><span>ISLAS DESCUBIERTAS</span></div><div><strong>${Math.floor(state.time / 60)} min</strong><span>DE AVENTURA</span></div></div><p class="modal-note">+500 doblones · Campaña completada. Puedes seguir explorando y mejorar tu navío.</p><button class="primary-button" id="victory-continue">El mar aún tiene historias <span>→</span></button>`,
     "EL CORAZÓN DEL ABISMO",
   );
   $("victory-continue").onclick = closeModal;
@@ -466,6 +569,15 @@ $("voyage-btn").onclick = () => {
 };
 $("pause-btn").onclick = () => (modal.open ? closeModal() : showPause());
 $("port-btn").onclick = showPort;
+$("fleet-btn").onclick = showFleet;
+$("contracts-btn").onclick = showContracts;
+$("ability-btn").onclick = () => {
+  if (started && !modal.open) {
+    special(state);
+    drainEvents();
+    refreshUI();
+  }
+};
 $("interact-prompt").onclick = doInteract;
 $("realm-btn").onclick = () => {
   if (started && !modal.open) {
@@ -525,6 +637,12 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     toggleRealm(state);
     drainEvents();
+  }
+  if (event.code === "KeyF") {
+    event.preventDefault();
+    special(state);
+    drainEvents();
+    refreshUI();
   }
   if (event.code === "KeyE") {
     event.preventDefault();

@@ -1,3 +1,10 @@
+import {
+  SHIPS,
+  ENEMY_TYPES,
+  CONTRACTS,
+  ACHIEVEMENTS,
+  RESCUES,
+} from "./content.js";
 export const WORLD = { width: 3200, height: 2400 };
 export const SAVE_KEY = "marea-negra-v1";
 export const ISLANDS = [
@@ -107,7 +114,15 @@ export function random(seed) {
 }
 const angleDelta = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 
-function enemy(id, x, y, realm = "real", boss = false) {
+export function enemy(
+  id,
+  x,
+  y,
+  realm = "real",
+  boss = false,
+  type = realm === "spectral" ? "shade" : "raider",
+) {
+  const stats = ENEMY_TYPES[type] || ENEMY_TYPES.raider;
   return {
     id,
     x,
@@ -115,8 +130,9 @@ function enemy(id, x, y, realm = "real", boss = false) {
     homeX: x,
     homeY: y,
     angle: -1,
-    hp: boss ? 520 : 70,
-    maxHp: boss ? 520 : 70,
+    hp: boss ? 520 : stats.hp,
+    maxHp: boss ? 520 : stats.hp,
+    type,
     realm,
     boss,
     cooldown: boss ? 2.5 : 1.8,
@@ -126,7 +142,7 @@ function enemy(id, x, y, realm = "real", boss = false) {
 }
 export function initialState() {
   return {
-    version: 1,
+    version: 2,
     time: 0,
     active: false,
     realm: "real",
@@ -144,7 +160,15 @@ export function initialState() {
       boost: 0,
       boostCooldown: 0,
       invulnerable: 0,
+      specialCooldown: 0,
+      shield: 0,
     },
+    shipId: "sloop",
+    ownedShips: ["sloop"],
+    claimedContracts: [],
+    achievements: [],
+    rescued: [],
+    spectralTime: 0,
     upgrades: { hull: 0, cannons: 0, sails: 0 },
     relics: [],
     discovered: ["port"],
@@ -160,6 +184,12 @@ export function initialState() {
       enemy("corsair-4", 800, 420),
       enemy("shade-1", 2090, 650, "spectral"),
       enemy("shade-2", 2720, 1840, "spectral"),
+      enemy("interceptor-1", 1360, 430, "real", false, "cutter"),
+      enemy("warbrig-1", 2200, 1010, "real", false, "brig"),
+      enemy("ironclad-1", 2840, 1460, "real", false, "dreadnought"),
+      enemy("interceptor-2", 720, 2100, "real", false, "cutter"),
+      enemy("shade-3", 1720, 2100, "spectral"),
+      enemy("warbrig-2", 1100, 1310, "real", false, "brig"),
     ],
     bullets: [],
     particles: [],
@@ -180,6 +210,108 @@ export function initialState() {
 
 export function emit(state, text, type = "info", sound = null) {
   state.events.push({ text, type, sound });
+}
+export const currentShip = (s) => SHIPS[s.shipId] || SHIPS.sloop;
+export function progress(s, metric) {
+  return (
+    {
+      islands: s.discovered.length,
+      sunk: s.sunk,
+      rescued: s.rescued.length,
+      spectralTime: Math.floor(s.spectralTime),
+      ships: s.ownedShips.length,
+      won: Number(s.won),
+    }[metric] || 0
+  );
+}
+export function checkAchievements(s) {
+  for (const a of ACHIEVEMENTS)
+    if (!s.achievements.includes(a.id) && progress(s, a.metric) >= a.target) {
+      s.achievements.push(a.id);
+      journal(s, `Logro desbloqueado: ${a.title}.`);
+      emit(s, `Logro: ${a.title}`, "success", "treasure");
+    }
+}
+export function selectShip(s, id) {
+  const ship = SHIPS[id];
+  if (!ship || !inPort(s)) return false;
+  if (!s.ownedShips.includes(id)) {
+    if (s.player.gold < ship.cost || s.relics.length < ship.relics)
+      return false;
+    s.player.gold -= ship.cost;
+    s.ownedShips.push(id);
+    journal(s, `${ship.name} se une a nuestra flota.`);
+  }
+  s.shipId = id;
+  s.player.maxHp = ship.hp + s.upgrades.hull * 50;
+  s.player.hp = s.player.maxHp;
+  // Los tiempos de recarga se conservan al cambiar de barco.
+  s.player.shield = 0;
+  emit(s, `Ahora navegas a bordo de ${ship.name}.`, "success", "discovery");
+  checkAchievements(s);
+  return true;
+}
+export function claimContract(s, id) {
+  const contract = CONTRACTS.find((c) => c.id === id);
+  if (
+    !contract ||
+    !inPort(s) ||
+    s.claimedContracts.includes(id) ||
+    progress(s, contract.metric) < contract.target
+  )
+    return false;
+  s.claimedContracts.push(id);
+  s.player.gold += contract.reward;
+  journal(
+    s,
+    `Contrato completado: ${contract.title}. +${contract.reward} doblones.`,
+  );
+  emit(s, `Contrato cobrado: +${contract.reward} doblones.`, "success", "coin");
+  return true;
+}
+export function special(s) {
+  const p = s.player,
+    ship = currentShip(s);
+  if (p.specialCooldown > 0) return false;
+  if (ship.id === "sloop" && p.hp >= p.maxHp) {
+    emit(s, "El casco ya está intacto. Guarda la reparación para el combate.");
+    return false;
+  }
+  p.specialCooldown = ship.cooldown;
+  if (ship.id === "sloop") p.hp = Math.min(p.maxHp, p.hp + 40);
+  if (ship.id === "galleon") p.shield = 5;
+  if (ship.id === "phantom") {
+    s.realm = "spectral";
+    p.energy = Math.min(100, p.energy + 50);
+    p.invulnerable = Math.max(3, p.invulnerable);
+  }
+  if (ship.id === "brig") {
+    const target = s.enemies
+      .filter((e) => !e.dead && e.realm === s.realm && dist(e, p) < 750)
+      .sort((a, b) => dist(a, p) - dist(b, p))[0];
+    const aim = target ? Math.atan2(target.y - p.y, target.x - p.x) : p.angle;
+    for (let n = 0; n < 7; n++) {
+      const angle = aim + (n - 3) * 0.1;
+      s.bullets.push({
+        x: p.x + Math.cos(angle) * 35,
+        y: p.y + Math.sin(angle) * 35,
+        vx: Math.cos(angle) * 570,
+        vy: Math.sin(angle) * 570,
+        life: 1.4,
+        damage: 24 + s.upgrades.cannons * 5,
+        owner: "player",
+        realm: s.realm,
+      });
+    }
+  }
+  burst(s, p.x, p.y, ship.color, 24);
+  emit(
+    s,
+    `${ship.ability} activada.`,
+    "success",
+    ship.id === "brig" ? "cannon" : "realm",
+  );
+  return true;
 }
 function journal(state, text) {
   state.journal.unshift({ time: state.time, text });
@@ -266,7 +398,7 @@ export function fire(s, point) {
       vx: Math.cos(a + offset) * 550,
       vy: Math.sin(a + offset) * 550,
       life: 1.3,
-      damage: 28 + s.upgrades.cannons * 5,
+      damage: currentShip(s).damage + s.upgrades.cannons * 5,
       owner: "player",
       realm: s.realm,
     });
@@ -306,7 +438,7 @@ function collideLand(entity, radius = 22) {
   }
 }
 function hurt(s, amount) {
-  if (s.player.invulnerable > 0 || s.won) return;
+  if (s.player.invulnerable > 0 || s.player.shield > 0 || s.won) return;
   s.player.hp = Math.max(0, s.player.hp - amount);
   s.player.invulnerable = 0.45;
   burst(s, s.player.x, s.player.y, "#d98864", 12);
@@ -352,15 +484,19 @@ export function update(s, dt, input = {}) {
   p.boost = Math.max(0, p.boost - dt);
   p.boostCooldown = Math.max(0, p.boostCooldown - dt);
   p.invulnerable = Math.max(0, p.invulnerable - dt);
+  p.specialCooldown = Math.max(0, p.specialCooldown - dt);
+  p.shield = Math.max(0, p.shield - dt);
   if (s.realm === "spectral") {
-    p.energy = Math.max(0, p.energy - dt * 4);
+    s.spectralTime += dt;
+    p.energy = Math.max(0, p.energy - dt * (s.shipId === "phantom" ? 2.6 : 4));
     if (!p.energy) toggleRealm(s);
   } else p.energy = Math.min(100, p.energy + dt * 6);
   if (input.boost) boost(s);
   const dx = Number(!!input.right) - Number(!!input.left),
     dy = Number(!!input.down) - Number(!!input.up);
   const magnitude = Math.hypot(dx, dy);
-  const speed = (155 + s.upgrades.sails * 25) * (p.boost > 0 ? 2.15 : 1);
+  const speed =
+    (currentShip(s).speed + s.upgrades.sails * 25) * (p.boost > 0 ? 2.15 : 1);
   const ease = Math.min(1, dt * 4);
   p.vx += ((magnitude ? (dx / magnitude) * speed : 0) - p.vx) * ease;
   p.vy += ((magnitude ? (dy / magnitude) * speed : 0) - p.vy) * ease;
@@ -396,6 +532,7 @@ export function update(s, dt, input = {}) {
   if (safe) p.hp = Math.min(p.maxHp, p.hp + dt * 7);
   for (const e of s.enemies) {
     if (e.dead) continue;
+    const enemyStats = ENEMY_TYPES[e.type] || ENEMY_TYPES.raider;
     e.hit = Math.max(0, e.hit - dt);
     e.cooldown -= dt;
     if (e.realm !== s.realm) continue;
@@ -406,13 +543,13 @@ export function update(s, dt, input = {}) {
     let a = Math.atan2(ty - e.y, tx - e.x);
     if (engaged && d < (e.boss ? 290 : 215)) a += Math.PI / 2;
     e.angle += angleDelta(e.angle, a) * Math.min(1, dt * 1.7);
-    const es = e.boss ? 73 : 64;
+    const es = e.boss ? 73 : enemyStats.speed;
     e.x = clamp(e.x + Math.cos(e.angle) * es * dt, 30, WORLD.width - 30);
     e.y = clamp(e.y + Math.sin(e.angle) * es * dt, 30, WORLD.height - 30);
     collideLand(e, e.boss ? 35 : 21);
     if (engaged && d < (e.boss ? 670 : 480) && e.cooldown <= 0) {
       const aim = Math.atan2(p.y + p.vy * 0.28 - e.y, p.x + p.vx * 0.28 - e.x),
-        shots = e.boss ? 5 : 1;
+        shots = e.boss ? 5 : enemyStats.shots;
       for (let n = 0; n < shots; n++) {
         const ba = aim + (n - (shots - 1) / 2) * 0.18;
         s.bullets.push({
@@ -421,12 +558,12 @@ export function update(s, dt, input = {}) {
           vx: Math.cos(ba) * 215,
           vy: Math.sin(ba) * 215,
           life: 3,
-          damage: e.boss ? 19 : 14,
+          damage: e.boss ? 19 : enemyStats.damage,
           owner: e.id,
           realm: e.realm,
         });
       }
-      e.cooldown = e.boss ? 2.2 : 2.4;
+      e.cooldown = e.boss ? 2.2 : enemyStats.reload;
     }
     if (engaged && d < (e.boss ? 55 : 40)) hurt(s, 10);
   }
@@ -437,7 +574,11 @@ export function update(s, dt, input = {}) {
     if (b.life <= 0 || b.realm !== s.realm) continue;
     if (b.owner === "player") {
       for (const e of s.enemies)
-        if (!e.dead && e.realm === b.realm && dist(e, b) < (e.boss ? 43 : 27)) {
+        if (
+          !e.dead &&
+          e.realm === b.realm &&
+          dist(e, b) < (e.boss ? 43 : 27 * (ENEMY_TYPES[e.type]?.scale || 1))
+        ) {
           b.life = 0;
           e.hp -= b.damage;
           e.hit = 0.18;
@@ -462,7 +603,7 @@ export function update(s, dt, input = {}) {
               s.loot.push({
                 x: e.x,
                 y: e.y,
-                amount: 60,
+                amount: (ENEMY_TYPES[e.type] || ENEMY_TYPES.raider).reward,
                 life: 90,
                 realm: e.realm,
               });
@@ -527,6 +668,19 @@ export function update(s, dt, input = {}) {
       );
     }
   } else s.damageClock = 0;
+  if (s.realm === "real")
+    for (const rescue of RESCUES) {
+      if (!s.rescued.includes(rescue.id) && dist(p, rescue) < 65) {
+        s.rescued.push(rescue.id);
+        p.gold += 45;
+        journal(
+          s,
+          "Un náufrago vuelve a casa. Su familia recompensa a la tripulación con 45 doblones.",
+        );
+        emit(s, "¡Náufrago a salvo! +45 doblones.", "success", "discovery");
+      }
+    }
+  checkAchievements(s);
 }
 
 export function interact(s) {
@@ -634,7 +788,7 @@ export function buyUpgrade(s, type) {
   s.player.gold -= cost;
   s.upgrades[type]++;
   if (type === "hull") {
-    s.player.maxHp = 130 + s.upgrades.hull * 50;
+    s.player.maxHp = currentShip(s).hp + s.upgrades.hull * 50;
     s.player.hp = s.player.maxHp;
   }
   journal(
@@ -668,7 +822,7 @@ export function restore(raw) {
   try {
     const saved = JSON.parse(raw);
     if (
-      saved.version !== 1 ||
+      ![1, 2].includes(saved.version) ||
       !saved.player ||
       !Array.isArray(saved.relics) ||
       !Array.isArray(saved.enemies)
@@ -722,7 +876,46 @@ export function restore(raw) {
       vy: 0,
       invulnerable: 3,
     };
-    s.player.maxHp = 130 + s.upgrades.hull * 50;
+    s.shipId = Object.hasOwn(SHIPS, saved.shipId) ? saved.shipId : "sloop";
+    s.ownedShips = [
+      ...new Set([
+        "sloop",
+        ...(Array.isArray(saved.ownedShips)
+          ? saved.ownedShips.filter((id) => Object.hasOwn(SHIPS, id))
+          : []),
+      ]),
+    ];
+    if (!s.ownedShips.includes(s.shipId)) s.shipId = "sloop";
+    s.claimedContracts = Array.isArray(saved.claimedContracts)
+      ? saved.claimedContracts.filter((id) =>
+          CONTRACTS.some((c) => c.id === id),
+        )
+      : [];
+    s.achievements = Array.isArray(saved.achievements)
+      ? saved.achievements.filter((id) => ACHIEVEMENTS.some((a) => a.id === id))
+      : [];
+    s.rescued = Array.isArray(saved.rescued)
+      ? [
+          ...new Set(
+            saved.rescued.filter((id) => RESCUES.some((r) => r.id === id)),
+          ),
+        ]
+      : [];
+    s.spectralTime = Number.isFinite(saved.spectralTime)
+      ? Math.max(0, saved.spectralTime)
+      : 0;
+    s.player.specialCooldown = Number.isFinite(p.specialCooldown)
+      ? Math.max(0, p.specialCooldown)
+      : 0;
+    s.player.shield = 0;
+    if (saved.version === 1) {
+      const existingIds = new Set(s.enemies.map((e) => e.id));
+      s.enemies.push(
+        ...initialState().enemies.filter((e) => !existingIds.has(e.id)),
+      );
+    }
+    s.version = 2;
+    s.player.maxHp = currentShip(s).hp + s.upgrades.hull * 50;
     s.player.hp = clamp(s.player.hp, 1, s.player.maxHp);
     s.player.energy = clamp(s.player.energy, 0, 100);
     s.loot = Array.isArray(s.loot) ? s.loot : [];

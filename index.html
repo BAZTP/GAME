@@ -149,8 +149,8 @@
           <div class="ship-name">
             <svg><use href="#i-sail" /></svg>
             <div>
-              <h3>La Peregrina</h3>
-              <p>Balandra de los mares libres</p>
+              <h3 id="ship-name">La Peregrina</h3>
+              <p id="ship-type">Balandra de los mares libres</p>
             </div>
           </div>
           <div class="hull-label">
@@ -176,6 +176,12 @@
             <svg><use href="#i-anchor" /></svg> Astillero y mejoras
             <span>↗</span>
           </button>
+          <div class="captain-links">
+            <button id="fleet-btn">Ver flota <span>4 navíos</span></button
+            ><button id="contracts-btn">
+              Contratos <span id="contract-ready">0 / 4</span>
+            </button>
+          </div>
         </section>
         <div class="sidebar-footer">
           <span class="small-compass">✥</span>
@@ -283,6 +289,10 @@
               ><button id="touch-fire" aria-label="Disparar cañones">⌖</button>
             </div>
           </div>
+          <button class="ability-button" id="ability-btn">
+            <kbd>F</kbd><span id="ability-name">Reparación de emergencia</span
+            ><b id="ability-cooldown">Lista</b>
+          </button>
           <div class="intro-overlay" id="intro-overlay">
             <div class="intro-card">
               <span class="eyebrow">UNA AVENTURA ENTRE DOS MUNDOS</span>

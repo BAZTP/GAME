@@ -10,6 +10,8 @@ const types = {
   ".js": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
   ".json": "application/json",
+  ".mp4": "video/mp4",
+  ".jpg": "image/jpeg",
 };
 const server = http.createServer(async (req, res) => {
   try {
@@ -20,7 +22,7 @@ const server = http.createServer(async (req, res) => {
     if (
       !file.startsWith(root + sep) ||
       path.split("/").some((p) => p.startsWith(".")) ||
-      ![".html", ".css", ".js", ".svg"].includes(extname(file))
+      ![".html", ".css", ".js", ".svg", ".mp4", ".jpg"].includes(extname(file))
     ) {
       res.writeHead(403).end("Acceso denegado");
       return;

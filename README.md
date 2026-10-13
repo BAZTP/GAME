@@ -39,6 +39,18 @@ Después de modificar el juego, ejecuta `npm run build` y sube también el nuevo
 
 ## La aventura
 
+### Novedades de la versión 1.1: la nueva flota
+
+- **Cuatro barcos jugables**: La Peregrina (balandra, reparación de emergencia), Viento Carmesí (bergantín, salva de siete proyectiles), La Fortaleza (galeón, escudo de cinco segundos) y Alma Errante (fragata espectral, paso entre mundos y mayor autonomía tras el velo).
+- **Flota persistente**: compras cada barco una vez y puedes cambiar gratis en los puertos. Conservas las mejoras del astillero. Los barcos avanzados requieren reliquias.
+- **Doce enemigos iniciales** de cinco clases: corsarios, interceptores, bergantines, acorazados y cazadores de ánimas, además del jefe final. Tienen distinta velocidad, resistencia, armamento y botín.
+- **Cuatro contratos** con recompensas por explorar, combatir, rescatar y navegar por el mar espectral. El progreso se registra automáticamente; cada recompensa se cobra una vez en un puerto.
+- **Cuatro náufragos** que puedes rescatar acercándote a sus balsas en el mundo real. La carta náutica los señala con `!`.
+- **Cinco logros** visibles en la bitácora.
+- **Partidas compatibles**: los guardados anteriores conservan monedas, reliquias, mejoras y enemigos derrotados. La migración añade los nuevos barcos enemigos una sola vez.
+
+Las habilidades se activan con **F** o con el botón sobre el mar. Cada una tiene su propia recarga, que se conserva al cambiar de barco.
+
 - **Ocho islas**: dos puertos, tres santuarios de reliquias, dos escondites de tesoros y la Boca del Abismo.
 - **Dos mundos**: cruza el velo para encontrar tesoros invisibles, combatir barcos espectrales y evitar la tormenta. El velo dura hasta 25 segundos; su energía se recupera en el mar real.
 - **Combate naval**: proyectiles, recarga, enemigos con patrullas y persecución, botín flotante y un jefe con salvas de cinco disparos.
@@ -60,6 +72,7 @@ Todo el arte está dibujado con Canvas y SVG; no se cargan fuentes, imágenes o 
 | Apuntar y disparar                          | Clic sobre el mar                    |
 | Impulso de velocidad                        | Shift; recarga de 6 segundos         |
 | Cruzar el velo                              | Q o botón de la luna                 |
+| Habilidad del navío                         | F o botón de habilidad               |
 | Explorar una isla / atracar                 | E o aviso junto a la costa           |
 | Abrir la carta náutica                      | M                                    |
 | Marcar rumbo                                | Clic en la carta náutica             |
@@ -80,3 +93,9 @@ En dispositivos táctiles aparecen flechas de navegación, disparo e impulso. Lo
 | `tests/browser.smoke.mjs` | Pruebas de interacción en Chromium, escritorio y móvil        |
 
 La campaña es para **un jugador**. No incluye multijugador ni publicación automática. Las pruebas del final cargan estados de partida controlados para verificar la interfaz, además de recorrer la progresión en las pruebas de simulación.
+
+## Video para YouTube y Facebook
+
+La página `docs/video.html` reproduce y permite descargar **`docs/media/marea-negra-demo.mp4`**. Es una demostración horizontal 16:9, de 1280 × 720 píxeles, con textos en español y una banda sonora sintetizada original. La portada y un texto sugerido para publicar están en `docs/media/`.
+
+El video utiliza gameplay real con partidas de demostración preparadas y controles reales. No tiene voz en off. Consulta `docs/media/PUBLICAR.md` para reproducir la grabación con Playwright y FFmpeg; la generación de audio requiere NumPy. Estas herramientas audiovisuales son opcionales y no se necesitan para jugar ni ejecutar las pruebas del juego.

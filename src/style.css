@@ -1701,3 +1701,290 @@ dialog::backdrop {
     transition: none !important;
   }
 }
+
+/* Flota, contratos y habilidades del capitán. */
+.captain-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 9px;
+}
+.captain-links button {
+  flex: 1;
+  background: #e8ecdf;
+  border: 1px solid #d5dccd;
+  border-radius: 3px;
+  padding: 10px 5px;
+  font-size: 10px;
+}
+.captain-links span {
+  display: block;
+  margin-top: 5px;
+  font-size: 8px;
+  color: #85907b;
+}
+.captain-links button:hover {
+  background: #dce5d6;
+}
+.ability-button {
+  position: absolute;
+  right: 24px;
+  bottom: 158px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #183944dd;
+  border: 1px solid #d5c29666;
+  color: #eee3c8;
+  border-radius: 4px;
+  font-size: 9px;
+  max-width: 245px;
+  backdrop-filter: blur(6px);
+}
+.ability-button kbd {
+  background: #b4bc9d25;
+  color: #e9dfbf;
+  border-color: #cec39866;
+}
+.ability-button b {
+  color: #cbb37c;
+  font-size: 8px;
+  white-space: nowrap;
+}
+.ability-button:hover:enabled {
+  background: #4b5750;
+}
+.port-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding: 4px;
+  background: #e7ecdf;
+  border-radius: 5px;
+}
+.port-tabs button {
+  flex: 1;
+  background: none;
+  border: 0;
+  padding: 10px;
+  color: #657961;
+  font-size: 11px;
+  border-radius: 3px;
+}
+.port-tabs button[aria-current] {
+  background: #f7f4e9;
+  color: #294d45;
+  box-shadow: 0 1px 5px #294d4510;
+}
+.fleet-dialog {
+  width: min(810px, calc(100vw - 28px));
+}
+.fleet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.fleet-card {
+  border: 1px solid #d3d9c9;
+  border-radius: 5px;
+  padding: 16px;
+  background: #f1f2e8;
+}
+.fleet-card.selected {
+  border-color: #879d7d;
+  box-shadow: inset 0 0 0 1px #879d7d;
+}
+.fleet-art {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #507b78, #224953);
+  border-radius: 3px;
+  margin-bottom: 14px;
+  height: 145px;
+  overflow: hidden;
+}
+.fleet-art canvas {
+  height: 145px;
+  width: 240px;
+}
+.fleet-art > span {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #d6dcbf;
+}
+.fleet-card h3 {
+  font:
+    25px Georgia,
+    serif;
+  margin: 0 0 6px;
+  color: #244842;
+}
+.fleet-card p {
+  font-size: 11px;
+  min-height: 39px;
+  margin: 0 0 13px !important;
+}
+.fleet-stats {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-top: 1px solid #d6ddcb;
+  font-size: 9px;
+}
+.fleet-ability {
+  padding: 10px 11px;
+  background: #e3e8d9;
+  border-radius: 3px;
+  min-height: 79px;
+}
+.fleet-ability strong {
+  display: block;
+  font-size: 11px;
+  color: #526b4d;
+}
+.fleet-ability small {
+  display: block;
+  font-size: 10px;
+  line-height: 1.6;
+  margin-top: 5px;
+}
+.fleet-card > button,
+.contract-card > button {
+  width: 100%;
+  margin-top: 13px;
+  padding: 11px 10px;
+  background: #284e48;
+  border: 1px solid #284e48;
+  border-radius: 3px;
+  color: #e9e8d2;
+  font-size: 11px;
+}
+.fleet-card > button:hover:enabled,
+.contract-card > button:hover:enabled {
+  background: #386b5e;
+}
+.contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin: 20px 0;
+}
+.contract-card {
+  border: 1px solid #d4dbcb;
+  border-radius: 4px;
+  padding: 16px;
+}
+.contract-card > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.contract-card h3 {
+  font:
+    21px Georgia,
+    serif;
+  margin: 0;
+  color: #294d45;
+}
+.contract-card > div > span {
+  font-size: 12px;
+  color: #9b824e;
+  white-space: nowrap;
+}
+.contract-card p {
+  font-size: 11px;
+  margin: 9px 0 !important;
+}
+.contract-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.contract-progress .meter {
+  flex: 1;
+}
+.contract-progress small {
+  font-size: 9px;
+}
+.contract-card > button {
+  width: auto;
+  min-width: 150px;
+  font-size: 10px;
+}
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-bottom: 22px;
+}
+.achievement {
+  padding: 13px 9px;
+  text-align: center;
+  border: 1px solid #d8ddce;
+  border-radius: 4px;
+  opacity: 0.5;
+}
+.achievement.unlocked {
+  opacity: 1;
+  background: #e4e9d8;
+  border-color: #b5c7a0;
+}
+.achievement > span {
+  display: block;
+  font:
+    27px Georgia,
+    serif;
+  color: #9f895c;
+}
+.achievement strong {
+  display: block;
+  font-size: 10px;
+  line-height: 1.5;
+  margin: 7px 0;
+}
+.achievement small {
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #7c8d6d;
+}
+@media (max-width: 560px) {
+  .fleet-grid {
+    grid-template-columns: 1fr;
+  }
+  .ability-button {
+    bottom: 215px;
+    right: 14px;
+    max-width: 230px;
+    padding: 9px;
+    font-size: 8px;
+  }
+  .interact-prompt {
+    bottom: 268px;
+  }
+  .achievement-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .fleet-art {
+    height: 130px;
+  }
+  .fleet-card p {
+    min-height: 0;
+  }
+  .contract-card h3 {
+    font-size: 18px;
+  }
+  .contract-card {
+    padding: 13px;
+  }
+  .contract-card > div > span {
+    font-size: 10px;
+  }
+}
