@@ -49,3 +49,51 @@ console.log(
   `Versión portátil creada: dist/marea-negra.html (${Math.round(Buffer.byteLength(html) / 1024)} KiB).`,
 );
 console.log("Publicación de GitHub Pages preparada: docs/index.html.");
+
+// Standalone 3D preview: embeds Three.js and all assets for Pages subpaths and offline play.
+const preview = await build({
+  entryPoints: [resolve(root, "src/three/main.js")],
+  bundle: true,
+  write: false,
+  minify: true,
+  format: "iife",
+  target: ["es2020"],
+  legalComments: "inline",
+});
+const previewTemplate = await readFile(resolve(root, "3d.html"), "utf8");
+const previewCss = await readFile(resolve(root, "src/three/style.css"), "utf8");
+const threeLicense = await readFile(
+  resolve(root, "node_modules/three/LICENSE"),
+  "utf8",
+);
+const previewHtml = previewTemplate
+  .replace(
+    "</head>",
+    () => `<!-- Three.js license\n${threeLicense}-->\n</head>`,
+  )
+  .replace(
+    '<link rel="stylesheet" href="./src/three/style.css" />',
+    () => `<style>${previewCss}</style>`,
+  )
+  .replace(
+    '<script type="module" src="./src/three/main.js"></script>',
+    () =>
+      `<script>${preview.outputFiles[0].text.replace(/<\/script/gi, "<\\/script")}</script>`,
+  )
+  .replace(
+    'href="./favicon.svg"',
+    `href="data:image/svg+xml,${encodeURIComponent(favicon)}"`,
+  );
+if (
+  previewHtml.includes('src="./src/three/') ||
+  previewHtml.includes('href="./src/three/')
+)
+  throw new Error("Faltan recursos en la versión 3D.");
+await writeFile(resolve(root, "docs/3d.html"), previewHtml);
+await writeFile(
+  resolve(root, "dist/3d.html"),
+  previewHtml.replaceAll('href="./index.html"', 'href="./marea-negra.html"'),
+);
+console.log(
+  `Travesía 3D preparada: docs/3d.html y dist/3d.html (${Math.round(Buffer.byteLength(previewHtml) / 1024)} KiB).`,
+);

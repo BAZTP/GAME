@@ -6,10 +6,11 @@ Una aventura pirata original para navegador, en español. Navega por un archipi�
 
 La versión portátil generada está en **`dist/marea-negra.html`**. Abre ese archivo en un navegador moderno para jugar sin instalar Node.js ni iniciar un servidor. Todo el arte, código y estilos están incluidos. El guardado local depende de que el navegador permita almacenamiento para archivos locales.
 
-Requiere **Node.js 20 o posterior**. El juego no necesita servicios externos, claves, cuentas, base de datos ni dependencias de ejecución.
+Requiere **Node.js 20 o posterior**. El juego no necesita servicios externos, claves, cuentas ni base de datos. La prueba 3D utiliza Three.js, instalado con `npm ci` e incorporado en el HTML publicado.
 
 ```sh
 cd /workspace/GAME
+npm ci --cache /tmp/npm-cache
 npm start
 ```
 
@@ -36,6 +37,27 @@ El archivo `docs/index.html` contiene el juego completo y sus recursos incorpora
 En el repositorio `BAZTP/GAME`, abre **Settings → Pages**, selecciona **Deploy from a branch**, elige la rama **main** y la carpeta **/docs**, y pulsa **Save**. Cuando GitHub termine el despliegue, el enlace previsto es **https://baztp.github.io/GAME/**. Ese enlace solo estará disponible después de activar Pages y completar el despliegue. La disponibilidad de Pages en repositorios privados depende del plan de GitHub.
 
 Después de modificar el juego, ejecuta `npm run build` y sube también el nuevo `docs/index.html`; GitHub actualizará la publicación desde esa carpeta.
+
+## Primera expedición en 3D
+
+Abre **[la travesía 3D](https://baztp.github.io/GAME/3d.html)** o el enlace «Prueba la travesía 3D» del juego. En desarrollo, la entrada es `3d.html`. Es una prueba independiente con cámara detrás del barco, ligeramente desplazada para dejar visible el objetivo: una balandra, tres islas, dos corsarios y un tesoro. Aún no convierte la campaña, el astillero ni el mar espectral a 3D.
+
+- **W / ↑** avanza, **A/D / ←/→** gira el timón y **S / ↓** frena y permite retroceder. El barco conserva impulso al soltar el acelerador.
+- **Espacio o clic sobre el mar** dispara hacia delante, con ayuda de puntería sobre enemigos cercanos alineados con la proa. El marcador muestra distancia y vida del objetivo.
+- **C** alterna entre dos distancias de cámara. **Esc** pausa o reanuda. En móvil aparecen controles táctiles y un botón de cámara.
+- Hunde a los dos corsarios, acércate al cofre dorado junto a Isla del Sol y pulsa **E** o «Recoger el tesoro». Si pierdes el barco, reapareces al inicio conservando el progreso de esta expedición.
+- Esta prueba se reinicia al recargar: no lee ni modifica tu partida de la campaña 2D. El sonido comparte únicamente la preferencia de activación.
+
+Requiere un navegador compatible con **WebGL 2**. Si la aceleración gráfica no está disponible, ofrece volver al juego 2D. Los modelos, el agua y las islas son procedurales; no hay recursos de CDN ni descargas durante el juego. Three.js se distribuye con su licencia MIT incluida en el HTML generado.
+
+`npm run build` genera `docs/3d.html` para GitHub Pages y `dist/3d.html` para usar junto a `dist/marea-negra.html`. Ambos incorporan sus recursos y pueden jugarse sin conexión una vez cargados. Para comprobar la escena:
+
+```sh
+npm test
+npm run test:3d
+```
+
+La prueba de navegador 3D usa Chromium con SwiftShader para verificar WebGL en el entorno sin GPU física; no mide el rendimiento de un teléfono real. Comprueba disparo y hundimiento, navegación, cámara, pausa, controles táctiles, compatibilidad sin conexión y la salida alternativa cuando falta WebGL. Las capturas se guardan en `test-results/3d-*.png`.
 
 ## La aventura
 

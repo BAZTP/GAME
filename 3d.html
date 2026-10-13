@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#102d34" />
+    <meta
+      name="description"
+      content="Toma el timón de La Peregrina. Prueba Marea Negra en 3D con cámara detrás del barco, islas y combate naval."
+    />
+    <title>Marea Negra — Travesía 3D</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/three/style.css" />
+  </head>
+  <body>
+    <main id="voyage">
+      <canvas
+        id="ocean"
+        tabindex="0"
+        aria-label="Aventura naval 3D. W para avanzar, A y D para girar, S para frenar, espacio para disparar."
+      ></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+      <header class="topbar">
+        <a class="brand" href="./index.html"
+          ><span class="brand-icon">✥</span
+          ><span>MAREA NEGRA<small>ECOS DEL ABISMO</small></span></a
+        >
+        <span class="edition">TRAVESÍA 3D <i></i> PRIMERA EXPEDICIÓN</span>
+        <div class="top-actions">
+          <button
+            id="sound"
+            aria-label="Activar sonido"
+            aria-pressed="false"
+            title="Activar sonido"
+          >
+            ♫<span class="sound-off">/</span></button
+          ><button id="pause" aria-label="Pausar" title="Pausa (Esc)" disabled>
+            Ⅱ</button
+          ><a class="return" href="./index.html">Aventura 2D ↗</a>
+        </div>
+      </header>
+      <section id="intro" class="intro-panel">
+        <span class="eyebrow">UN NUEVO HORIZONTE</span>
+        <h1>El mar, desde<br />el timón.</h1>
+        <p>
+          Las velas al viento. La costa a la vista.<br />Y dos corsarios entre
+          tú y el tesoro.
+        </p>
+        <div class="intro-rule"></div>
+        <span class="chapter">01 / LA ISLA DEL SOL</span>
+        <p class="intro-detail">
+          Una primera expedición en 3D con cámara detrás de tu barco. Derrota a
+          los guardianes de la isla y recupera el cofre.
+        </p>
+        <button id="start" class="primary" disabled>Preparando el mar…</button>
+        <span class="intro-note"
+          >Teclado o controles táctiles · Sonido opcional</span
+        >
+        <span class="preview-note"
+          >Prueba jugable · Tu campaña 2D se conserva.</span
+        >
+      </section>
+      <div id="hud" hidden>
+        <section class="mission glass">
+          <span class="eyebrow">TU EXPEDICIÓN</span>
+          <h2 id="objective">La costa tiene guardianes.</h2>
+          <p id="mission-detail">Derrota a los dos corsarios.</p>
+          <div class="mission-progress">
+            <span id="kills">0 / 2</span><span id="distance">ISLA DEL SOL</span>
+          </div>
+        </section>
+        <div class="heading">
+          <span id="bearing">N</span
+          ><span class="heading-line">· · · · │ · · · ·</span
+          ><small>RUMBO</small>
+        </div>
+        <div id="target-marker" class="target-marker" hidden>
+          <span>⌖</span><small id="target-range"></small>
+        </div>
+        <div class="reticle" aria-hidden="true">＋</div>
+        <div id="notice" class="notice" role="status" aria-live="polite"></div>
+        <button id="collect" class="primary collect" hidden>
+          Recoger el tesoro <kbd>E</kbd>
+        </button>
+        <div class="bottom-hud">
+          <section class="ship-panel glass">
+            <span class="eyebrow">TU NAVÍO</span>
+            <h2>La Peregrina <span>BALANDRA</span></h2>
+            <div class="health-text">
+              <span>Integridad del casco</span
+              ><strong id="hp">140 / 140</strong>
+            </div>
+            <div class="health-track"><span id="hp-fill"></span></div>
+            <div class="ship-readouts">
+              <span><strong id="speed">0</strong> NUDOS</span
+              ><span id="cannon-status">CAÑÓN LISTO</span>
+            </div>
+          </section>
+          <div class="controls-legend">
+            <span
+              ><kbd>W</kbd> Avanzar <kbd>A D</kbd> Girar
+              <kbd>S</kbd> Frenar</span
+            ><span
+              ><kbd>ESPACIO</kbd> Cañón <kbd>C</kbd> Cámara
+              <kbd>ESC</kbd> Pausa</span
+            >
+          </div>
+          <section class="chart glass">
+            <canvas
+              id="chart"
+              width="240"
+              height="240"
+              aria-label="Carta náutica: tu barco, islas, enemigos y tesoro"
+            ></canvas
+            ><span>ARCHIPIÉLAGO DE LAS ÁNIMAS</span>
+          </section>
+        </div>
+        <button
+          id="camera"
+          class="camera-button glass"
+          title="Cambiar distancia de cámara (C)"
+        >
+          Cámara · cercana
+        </button>
+        <div
+          class="touch-controls"
+          id="touch-controls"
+          aria-label="Controles táctiles"
+        >
+          <div class="helm">
+            <button data-key="forward" class="ahead" aria-label="Avanzar">
+              ↑</button
+            ><button data-key="left" aria-label="Girar a babor">←</button
+            ><button data-key="brake" aria-label="Frenar o retroceder">↓</button
+            ><button data-key="right" aria-label="Girar a estribor">→</button>
+          </div>
+          <button data-key="fire" id="touch-fire" aria-label="Disparar cañón">
+            ⌖<small>FUEGO</small>
+          </button>
+        </div>
+      </div>
+      <dialog id="dialog">
+        <span class="eyebrow" id="dialog-eyebrow">A RESGUARDO DEL MAR</span>
+        <h2 id="dialog-title">Una pausa en la travesía.</h2>
+        <p id="dialog-copy">
+          W o ↑: avanzar. A/D o ←/→: girar. S o ↓: frenar. Alinea el barco con
+          un corsario y dispara con Espacio. C cambia la distancia de la cámara.
+        </p>
+        <button class="primary" id="resume">Volver al timón →</button
+        ><button class="secondary" id="restart">Nueva expedición</button
+        ><a href="./index.html">Volver a la aventura 2D</a>
+      </dialog>
+      <section id="unavailable" class="intro-panel" hidden>
+        <span class="eyebrow">EL MAR SIGUE AHÍ</span>
+        <h1>No pudimos<br />abrir el 3D.</h1>
+        <p id="error-copy">
+          Prueba un navegador con aceleración gráfica activada, o continúa la
+          aventura en 2D.
+        </p>
+        <a class="primary" href="./index.html">Jugar en 2D →</a
+        ><button class="secondary" onclick="location.reload()">
+          Reintentar
+        </button>
+      </section>
+    </main>
+    <script type="module" src="./src/three/main.js"></script>
+  </body>
+</html>
