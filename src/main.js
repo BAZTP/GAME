@@ -25,6 +25,8 @@ import {
   progress,
   special,
 } from "./game.js";
+import { Sound } from "./sound.js";
+import { seaConditions } from "./sea.js";
 import { Renderer } from "./render.js";
 import { SHIPS, CONTRACTS, ACHIEVEMENTS } from "./content.js";
 
@@ -57,92 +59,7 @@ if (saved) {
 }
 const renderer = new Renderer(canvas, $("minimap"));
 
-class Sound {
-  constructor() {
-    this.enabled = false;
-    this.ctx = null;
-    try {
-      this.enabled = localStorage.getItem("marea-sound") === "on";
-    } catch {}
-    this.refresh();
-  }
-  refresh() {
-    $("sound-btn").setAttribute("aria-pressed", String(this.enabled));
-    $("sound-btn").setAttribute(
-      "aria-label",
-      this.enabled ? "Desactivar sonido" : "Activar sonido",
-    );
-    $("sound-btn").title = this.enabled
-      ? "Desactivar sonido"
-      : "Activar sonido";
-    $("sound-btn").querySelector(".sound-off").hidden = this.enabled;
-  }
-  init() {
-    if (!this.enabled) return;
-    try {
-      this.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
-      if (this.ctx.state === "suspended") this.ctx.resume().catch(() => {});
-    } catch {
-      this.enabled = false;
-      this.refresh();
-    }
-  }
-  play(name) {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    const ctx = this.ctx,
-      at = ctx.currentTime;
-    const tone = (freq, start, duration, type = "sine", volume = 0.05) => {
-      const osc = ctx.createOscillator(),
-        gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, at + start);
-      gain.gain.setValueAtTime(0, at + start);
-      gain.gain.linearRampToValueAtTime(volume, at + start + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.001, at + start + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(at + start);
-      osc.stop(at + start + duration + 0.03);
-    };
-    if (name === "cannon" || name === "hit" || name === "sunk") {
-      const duration = name === "cannon" ? 0.25 : name === "sunk" ? 0.55 : 0.12;
-      const buffer = ctx.createBuffer(
-          1,
-          ctx.sampleRate * duration,
-          ctx.sampleRate,
-        ),
-        data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i++)
-        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) ** 3;
-      const source = ctx.createBufferSource(),
-        filter = ctx.createBiquadFilter(),
-        gain = ctx.createGain();
-      source.buffer = buffer;
-      filter.type = "lowpass";
-      filter.frequency.value = name === "cannon" ? 520 : 1100;
-      gain.gain.value = 0.11;
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-      source.start();
-      tone(name === "cannon" ? 70 : 110, 0, duration, "sine", 0.06);
-      return;
-    }
-    const notes = {
-      coin: [660, 880],
-      treasure: [330, 440, 554, 660, 880],
-      discovery: [392, 494, 587],
-      realm: [220, 330, 440, 554],
-      boost: [180, 260],
-      boss: [110, 130, 147],
-      victory: [330, 440, 554, 660, 554, 660, 880],
-    }[name] || [440];
-    notes.forEach((n, i) => tone(n, i * 0.1, 0.55, "sine", 0.045));
-  }
-}
-const sound = new Sound();
+const sound = new Sound($("sound-btn"));
 
 function save() {
   if (!started) return;
@@ -181,6 +98,7 @@ function drainEvents() {
 }
 function openModal(title, body, eyebrow = "MAREA NEGRA", className = "") {
   state.active = false;
+  sound.updateScene(state);
   input = {};
   mapCanvas = null;
   $("modal-title").textContent = title;
@@ -236,6 +154,9 @@ function confirmNew() {
 }
 
 function refreshUI() {
+  const weather = seaConditions(state);
+  $("weather-readout").textContent =
+    `${weather.icon} ${weather.hour} · ${weather.label}`;
   const p = state.player;
   const ship = currentShip(state);
   $("ship-name").textContent = ship.name;
@@ -311,7 +232,7 @@ function refreshUI() {
 function showHelp() {
   openModal(
     "El mar es tuyo.",
-    `<p>Recupera las reliquias del Sol, la Luna y la Marea. Llévalas a la Boca del Abismo, cruza el velo e invoca al Almirante Hueco para liberar los dos mares.</p><div class="control-grid"><div><kbd>WASD / ↑↓←→</kbd> Navegar</div><div><kbd>ESPACIO</kbd> Disparar al rival cercano</div><div><kbd>CLIC</kbd> Apuntar y disparar</div><div><kbd>SHIFT</kbd> Impulso · recarga 6 s</div><div><kbd>Q</kbd> Alternar los dos mundos</div><div><kbd>F</kbd> Habilidad del navío</div><div><kbd>E</kbd> Explorar o atracar</div><div><kbd>M</kbd> Carta náutica</div><div><kbd>ESC</kbd> Pausar / reanudar</div></div><p class="modal-note">En móvil, usa las flechas y los botones sobre el mar. Toca la luna para cruzar el velo y el aviso de la costa para desembarcar.</p><p><strong>El velo:</strong> dura hasta 25 segundos. Su energía se recupera en el mundo real. Solo puedes atacar y recibir ataques de barcos en tu mismo mundo.</p><p><strong>La nueva flota:</strong> compra barcos en el astillero y activa su habilidad con F o el botón sobre el mar. Los contratos ofrecen recompensas; rescata náufragos acercándote a sus balsas y consulta tus logros en la bitácora.</p><p><strong>Puertos:</strong> reparan gratis y ofrecen mejores cañones, casco y velas. Si naufragas, pierdes el 15 % de tus doblones y vuelves al puerto conservando tus reliquias y mejoras.</p><p><strong>Tu brújula:</strong> sigue el objetivo de la campaña. En el mapa puedes marcar otro rumbo. La tormenta daña el casco, pero no te alcanza en el mar espectral.</p><button class="primary-button" id="help-done">Entendido, capitán <span>→</span></button>`,
+    `<p>Recupera las reliquias del Sol, la Luna y la Marea. Llévalas a la Boca del Abismo, cruza el velo e invoca al Almirante Hueco para liberar los dos mares.</p><div class="control-grid"><div><kbd>WASD / ↑↓←→</kbd> Navegar</div><div><kbd>ESPACIO</kbd> Disparar al rival cercano</div><div><kbd>CLIC</kbd> Apuntar y disparar</div><div><kbd>SHIFT</kbd> Impulso · recarga 6 s</div><div><kbd>Q</kbd> Alternar los dos mundos</div><div><kbd>F</kbd> Habilidad del navío</div><div><kbd>E</kbd> Explorar o atracar</div><div><kbd>M</kbd> Carta náutica</div><div><kbd>ESC</kbd> Pausar / reanudar</div></div><p class="modal-note">En móvil, usa las flechas y los botones sobre el mar. Toca la luna para cruzar el velo y el aviso de la costa para desembarcar.</p><p><strong>Navegación:</strong> el barco gira hacia el rumbo que marcas y conserva impulso al soltar las teclas. El galeón necesita más espacio para virar. El día, la noche y la lluvia cambian durante la travesía; activa el altavoz para escuchar el mar.</p><p><strong>El velo:</strong> dura hasta 25 segundos. Su energía se recupera en el mundo real. Solo puedes atacar y recibir ataques de barcos en tu mismo mundo.</p><p><strong>La nueva flota:</strong> compra barcos en el astillero y activa su habilidad con F o el botón sobre el mar. Los contratos ofrecen recompensas; rescata náufragos acercándote a sus balsas y consulta tus logros en la bitácora.</p><p><strong>Puertos:</strong> reparan gratis y ofrecen mejores cañones, casco y velas. Si naufragas, pierdes el 15 % de tus doblones y vuelves al puerto conservando tus reliquias y mejoras.</p><p><strong>Tu brújula:</strong> sigue el objetivo de la campaña. En el mapa puedes marcar otro rumbo. La tormenta daña el casco, pero no te alcanza en el mar espectral.</p><button class="primary-button" id="help-done">Entendido, capitán <span>→</span></button>`,
     "MANUAL DE NAVEGACIÓN",
   );
   $("help-done").onclick = closeModal;
@@ -589,6 +510,7 @@ $("realm-btn").onclick = () => {
 $("sound-btn").onclick = () => {
   sound.enabled = !sound.enabled;
   sound.refresh();
+  if (!sound.enabled) sound.silence();
   sound.init();
   sound.play("coin");
   try {
@@ -661,10 +583,12 @@ document.addEventListener("keyup", (event) => {
   if (keymap[event.code]) input[keymap[event.code]] = false;
 });
 window.addEventListener("blur", () => {
+  sound.silence();
   input = {};
   if (started && !modal.open) showPause();
 });
 document.addEventListener("visibilitychange", () => {
+  if (document.hidden) sound.silence();
   if (document.hidden && started) {
     input = {};
     save();
@@ -719,6 +643,7 @@ function frame(now) {
   uiClock += dt;
   if (uiClock > 0.12) {
     refreshUI();
+    sound.updateScene(state);
     uiClock = 0;
   }
   if (state.autosave > 5) save();

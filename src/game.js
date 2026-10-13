@@ -5,6 +5,7 @@ import {
   ACHIEVEMENTS,
   RESCUES,
 } from "./content.js";
+import { navigate, seaConditions, combatEffect, sinkShip } from "./sea.js";
 export const WORLD = { width: 3200, height: 2400 };
 export const SAVE_KEY = "marea-negra-v1";
 export const ISLANDS = [
@@ -193,6 +194,8 @@ export function initialState() {
     ],
     bullets: [],
     particles: [],
+    effects: [],
+    wrecks: [],
     loot: [],
     trail: [],
     events: [],
@@ -405,6 +408,8 @@ export function fire(s, point) {
   }
   p.reload = 0.72 - s.upgrades.cannons * 0.07;
   burst(s, p.x + Math.cos(a) * 30, p.y + Math.sin(a) * 30, "#ffdb93", 8);
+  combatEffect(s, p.x + Math.cos(a) * 30, p.y + Math.sin(a) * 30, "cannon", a);
+  p.recoil = 0.18;
   s.events.push({ sound: "cannon" });
   return true;
 }
@@ -434,6 +439,13 @@ function collideLand(entity, radius = 22) {
       const a = Math.atan2(entity.y - i.y, entity.x - i.x);
       entity.x = i.x + Math.cos(a) * min;
       entity.y = i.y + Math.sin(a) * min;
+      if (Number.isFinite(entity.vx) && Number.isFinite(entity.vy)) {
+        const inward = entity.vx * Math.cos(a) + entity.vy * Math.sin(a);
+        if (inward < 0) {
+          entity.vx -= Math.cos(a) * inward;
+          entity.vy -= Math.sin(a) * inward;
+        }
+      }
     }
   }
 }
@@ -442,8 +454,10 @@ function hurt(s, amount) {
   s.player.hp = Math.max(0, s.player.hp - amount);
   s.player.invulnerable = 0.45;
   burst(s, s.player.x, s.player.y, "#d98864", 12);
+  combatEffect(s, s.player.x, s.player.y, "impact");
   s.events.push({ sound: "hit" });
   if (s.player.hp <= 0) {
+    sinkShip(s, s.player, true);
     const lost = Math.ceil(s.player.gold * 0.15);
     s.player.gold -= lost;
     s.deaths++;
@@ -481,6 +495,7 @@ export function update(s, dt, input = {}) {
   s.autosave += dt;
   const p = s.player;
   p.reload = Math.max(0, p.reload - dt);
+  p.recoil = Math.max(0, (p.recoil || 0) - dt);
   p.boost = Math.max(0, p.boost - dt);
   p.boostCooldown = Math.max(0, p.boostCooldown - dt);
   p.invulnerable = Math.max(0, p.invulnerable - dt);
@@ -492,18 +507,11 @@ export function update(s, dt, input = {}) {
     if (!p.energy) toggleRealm(s);
   } else p.energy = Math.min(100, p.energy + dt * 6);
   if (input.boost) boost(s);
-  const dx = Number(!!input.right) - Number(!!input.left),
-    dy = Number(!!input.down) - Number(!!input.up);
-  const magnitude = Math.hypot(dx, dy);
   const speed =
     (currentShip(s).speed + s.upgrades.sails * 25) * (p.boost > 0 ? 2.15 : 1);
-  const ease = Math.min(1, dt * 4);
-  p.vx += ((magnitude ? (dx / magnitude) * speed : 0) - p.vx) * ease;
-  p.vy += ((magnitude ? (dy / magnitude) * speed : 0) - p.vy) * ease;
+  navigate(p, dt, input, speed, s.shipId);
   p.x = clamp(p.x + p.vx * dt, 35, WORLD.width - 35);
   p.y = clamp(p.y + p.vy * dt, 35, WORLD.height - 35);
-  if (magnitude)
-    p.angle += angleDelta(p.angle, Math.atan2(dy, dx)) * Math.min(1, dt * 5);
   collideLand(p);
   if (input.fire) fire(s);
   if (
@@ -534,6 +542,7 @@ export function update(s, dt, input = {}) {
     if (e.dead) continue;
     const enemyStats = ENEMY_TYPES[e.type] || ENEMY_TYPES.raider;
     e.hit = Math.max(0, e.hit - dt);
+    e.recoil = Math.max(0, (e.recoil || 0) - dt);
     e.cooldown -= dt;
     if (e.realm !== s.realm) continue;
     const d = dist(p, e),
@@ -564,6 +573,15 @@ export function update(s, dt, input = {}) {
         });
       }
       e.cooldown = e.boss ? 2.2 : enemyStats.reload;
+      e.recoil = 0.18;
+      combatEffect(
+        s,
+        e.x + Math.cos(aim) * 30,
+        e.y + Math.sin(aim) * 30,
+        "cannon",
+        aim,
+      );
+      if (d < 600) s.events.push({ sound: "enemy-cannon" });
     }
     if (engaged && d < (e.boss ? 55 : 40)) hurt(s, 10);
   }
@@ -571,7 +589,11 @@ export function update(s, dt, input = {}) {
     b.life -= dt;
     b.x += b.vx * dt;
     b.y += b.vy * dt;
-    if (b.life <= 0 || b.realm !== s.realm) continue;
+    if (b.life <= 0) {
+      if (b.realm === s.realm) combatEffect(s, b.x, b.y, "splash");
+      continue;
+    }
+    if (b.realm !== s.realm) continue;
     if (b.owner === "player") {
       for (const e of s.enemies)
         if (
@@ -582,9 +604,11 @@ export function update(s, dt, input = {}) {
           b.life = 0;
           e.hp -= b.damage;
           e.hit = 0.18;
+          combatEffect(s, b.x, b.y, "impact");
           burst(s, b.x, b.y, e.realm === "spectral" ? "#b1e3d5" : "#ecc28b", 9);
           s.events.push({ sound: "hit" });
           if (e.hp <= 0) {
+            sinkShip(s, e);
             e.dead = true;
             s.sunk++;
             burst(s, e.x, e.y, e.boss ? "#ccb4ff" : "#efbc74", 38);
@@ -631,6 +655,7 @@ export function update(s, dt, input = {}) {
     ) {
       b.life = 0;
       burst(s, b.x, b.y, "#ceb991", 4);
+      combatEffect(s, b.x, b.y, "splash");
     }
   }
   s.bullets = s.bullets.filter((b) => b.life > 0);
@@ -655,6 +680,35 @@ export function update(s, dt, input = {}) {
     particle.life -= dt;
   }
   s.particles = s.particles.filter((p) => p.life > 0);
+  for (const effect of s.effects) {
+    effect.life -= dt;
+    effect.x += effect.vx * dt;
+    effect.y += effect.vy * dt;
+    if (effect.type === "smoke") {
+      effect.x += 9 * dt;
+      effect.y -= 5 * dt;
+    }
+    if (effect.type === "splinter") effect.vy += 24 * dt;
+  }
+  s.effects = s.effects.filter((effect) => effect.life > 0);
+  for (const wreck of s.wrecks) wreck.life -= dt;
+  s.wrecks = s.wrecks.filter((wreck) => wreck.life > 0);
+  if (Math.floor(s.time * 3) !== Math.floor((s.time - dt) * 3)) {
+    for (const vessel of [p, ...s.enemies]) {
+      if (
+        !vessel.dead &&
+        vessel.hp / vessel.maxHp < 0.32 &&
+        (!vessel.realm || vessel.realm === s.realm)
+      )
+        combatEffect(s, vessel.x, vessel.y, "damage");
+    }
+  }
+  const weather = seaConditions(s);
+  if (
+    weather.storm > 0.65 &&
+    Math.floor((s.time + 3) / 17) !== Math.floor((s.time - dt + 3) / 17)
+  )
+    s.events.push({ sound: "thunder" });
   // La tormenta puede evitarse navegando alrededor o cruzando el velo.
   if (s.realm === "real" && Math.hypot(p.x - 1610, p.y - 1200) < 145 && !safe) {
     s.damageClock += dt;
@@ -812,7 +866,16 @@ export function repair(s) {
 }
 
 export function serialize(s) {
-  const { active, events, particles, trail, bullets, ...saved } = s;
+  const {
+    active,
+    events,
+    particles,
+    trail,
+    bullets,
+    effects,
+    wrecks,
+    ...saved
+  } = s;
   return JSON.stringify({
     ...saved,
     player: { ...saved.player, vx: 0, vy: 0, boost: 0 },
@@ -862,6 +925,8 @@ export function restore(raw) {
     Object.assign(s, saved, {
       active: false,
       particles: [],
+      effects: [],
+      wrecks: [],
       events: [],
       bullets: [],
       trail: [],

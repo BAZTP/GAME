@@ -39,6 +39,15 @@ Después de modificar el juego, ejecuta `npm run build` y sube también el nuevo
 
 ## La aventura
 
+### Novedades de la versión 1.2: un mar más vivo
+
+- Oleaje, espuma en la costa y balanceo de los navíos. El ciclo de día y noche dura ocho minutos de juego; el reloj y el clima se conservan al guardar y se detienen al pausar.
+- Lluvia, nubes y relámpagos suaves. La lluvia ambiental es visual; la zona de tormenta del mapa mantiene su peligro original. El mar espectral tiene su propia bruma.
+- Giros graduales, aceleración e inercia: la proa sigue la dirección indicada con WASD o las flechas. El galeón gira más despacio que la balandra; anticipa las maniobras cerca de la costa.
+- Retroceso del cañón, humo, astillas, salpicaduras, fuego en cascos muy dañados y animación de hundimiento.
+- Sonidos sintetizados de oleaje, viento, lluvia, crujidos, truenos y cañones con eco. Usa el altavoz de la cabecera; el ambiente se desvanece al pausar y el audio se silencia al ocultar la pestaña.
+- La preferencia del sistema de reducir movimiento desactiva el balanceo, los relámpagos y la animación ambiental. Las partidas anteriores siguen siendo compatibles.
+
 ### Novedades de la versión 1.1: la nueva flota
 
 - **Cuatro barcos jugables**: La Peregrina (balandra, reparación de emergencia), Viento Carmesí (bergantín, salva de siete proyectiles), La Fortaleza (galeón, escudo de cinco segundos) y Alma Errante (fragata espectral, paso entre mundos y mayor autonomía tras el velo).
@@ -82,15 +91,17 @@ En dispositivos táctiles aparecen flechas de navegación, disparo e impulso. Lo
 
 ## Estructura
 
-| Archivo                   | Responsabilidad                                               |
-| ------------------------- | ------------------------------------------------------------- |
-| `src/game.js`             | Simulación, combate, economía, misión y guardado serializable |
-| `src/render.js`           | Ilustración del mundo, barcos, partículas, cámara y mapas     |
-| `src/main.js`             | Interfaz, controles, ventanas, audio y almacenamiento local   |
-| `src/style.css`           | Interfaz adaptable a escritorio y móvil                       |
-| `server.mjs`              | Servidor estático sin dependencias                            |
-| `tests/game.test.mjs`     | Pruebas de reglas y progresión completa                       |
-| `tests/browser.smoke.mjs` | Pruebas de interacción en Chromium, escritorio y móvil        |
+| Archivo                            | Responsabilidad                                               |
+| ---------------------------------- | ------------------------------------------------------------- |
+| `src/game.js`                      | Simulación, combate, economía, misión y guardado serializable |
+| `src/render.js`                    | Ilustración del mundo, barcos, partículas, cámara y mapas     |
+| `src/main.js`                      | Interfaz, controles, ventanas y almacenamiento local          |
+| `src/sea.js` / `src/sea-render.js` | Manejo naval, clima y efectos ambientales                     |
+| `src/sound.js`                     | Ambiente y efectos mediante Web Audio                         |
+| `src/style.css`                    | Interfaz adaptable a escritorio y móvil                       |
+| `server.mjs`                       | Servidor estático sin dependencias                            |
+| `tests/game.test.mjs`              | Pruebas de reglas y progresión completa                       |
+| `tests/browser.smoke.mjs`          | Pruebas de interacción en Chromium, escritorio y móvil        |
 
 La campaña es para **un jugador**. No incluye multijugador ni publicación automática. Las pruebas del final cargan estados de partida controlados para verificar la interfaz, además de recorrer la progresión en las pruebas de simulación.
 

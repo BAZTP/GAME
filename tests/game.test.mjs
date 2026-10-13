@@ -29,6 +29,7 @@ const tick = (s, seconds, input = {}) => {
 test("navigation moves the ship; pause freezes position, timers and enemies", () => {
   const s = initialState(),
     before = s.player.x;
+  s.player.angle = 0; // Esta prueba mide avance; los giros se prueban por separado.
   tick(s, 1, { right: true });
   assert.ok(s.player.x > before + 100);
   s.active = false;

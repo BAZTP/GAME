@@ -1,5 +1,7 @@
 import { ISLANDS, WORLD, dist, random, nextTarget, clamp } from "./game.js";
 import { SHIPS, ENEMY_TYPES, RESCUES } from "./content.js";
+import { seaConditions } from "./sea.js";
+import { SeaPainter } from "./sea-render.js";
 
 const TAU = Math.PI * 2;
 function line(ctx, points, color, width = 1) {
@@ -123,6 +125,7 @@ export class Renderer {
     this.zoom = 1;
     this.clock = 0;
     this.cache = new Map();
+    this.sea = new SeaPainter();
     this.reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     this.resize();
   }
@@ -344,7 +347,8 @@ export class Renderer {
   }
   draw(s, dt, intro = false) {
     if (!this.w || !this.h) return;
-    this.clock += this.reducedMotion ? 0 : dt;
+    this.clock += this.reducedMotion || (!s.active && !intro) ? 0 : dt;
+    this.weather = seaConditions(s);
     const t = this.clock,
       c = this.ctx,
       sp = s.realm === "spectral",
@@ -408,6 +412,7 @@ export class Renderer {
       ellipse(c, x, y, 3, 1, sp ? "#9cb8d012" : "#c5d2b513");
     }
     // Limites du monde : lignes cartographiques discrètes.
+    this.sea.waves(c, { left, top, right, bottom }, t, this.weather);
     c.strokeStyle = "#d8d5ad22";
     c.lineWidth = 2;
     c.setLineDash([10, 15]);
@@ -427,6 +432,21 @@ export class Renderer {
         continue;
       }
       c.drawImage(this.islandSprite(i, sp), i.x - 280, i.y - 250);
+      c.save();
+      c.translate(i.x, i.y);
+      const tide = (t * 0.17 + i.seed * 0.11) % 1;
+      islandPath(c, i.r, i.seed, 1.13 + tide * 0.12);
+      c.strokeStyle = `rgba(215,239,213,${(1 - tide) * 0.2})`;
+      c.lineWidth = 1.5;
+      c.stroke();
+      c.restore();
+      if (i.kind === "port" && this.weather.daylight < 0.6 && !sp) {
+        c.save();
+        c.globalAlpha = (1 - this.weather.daylight) * 0.65;
+        c.drawImage(this.sea.light, i.x - 65, i.y - 15, 65, 65);
+        c.drawImage(this.sea.light, i.x + 5, i.y - 35, 60, 60);
+        c.restore();
+      }
       if (
         i.kind === "relic" &&
         !s.relics.includes(i.id) &&
@@ -516,6 +536,26 @@ export class Renderer {
         "#d6e7d8",
         1.5,
       );
+      c.restore();
+    }
+    for (const wreck of s.wrecks || []) {
+      if (wreck.realm !== s.realm) continue;
+      const progress = 1 - wreck.life / wreck.maxLife;
+      this.ship(c, { ...wreck, sinking: progress }, t, wreck.player);
+      c.save();
+      c.strokeStyle = `rgba(181,216,210,${(1 - progress) * 0.35})`;
+      c.lineWidth = 1.3;
+      c.beginPath();
+      c.ellipse(
+        wreck.x,
+        wreck.y,
+        30 + progress * 55,
+        13 + progress * 26,
+        0,
+        0,
+        TAU,
+      );
+      c.stroke();
       c.restore();
     }
     for (const item of s.loot) {
@@ -633,6 +673,7 @@ export class Renderer {
       ellipse(c, p.x, p.y, p.size, p.size, p.color);
     }
     c.globalAlpha = 1;
+    this.sea.effects(c, s);
     if (!this.reducedMotion)
       for (let n = 0; n < 6; n++) {
         const bx = 790 + n * 26 + Math.sin(t * 0.17) * 150,
@@ -663,6 +704,7 @@ export class Renderer {
     vignette.addColorStop(1, sp ? "#0e172e88" : "#052e3b77");
     c.fillStyle = vignette;
     c.fillRect(0, 0, w, h);
+    this.sea.atmosphere(c, w, h, t, this.weather, sp, this.reducedMotion);
     if (!intro) this.drawBearing(c, s);
     this.drawCompass(c, w - 49, h * 0.48, sp);
     if (s.player.hp < s.player.maxHp * 0.3 && !intro) {
@@ -762,7 +804,18 @@ export class Renderer {
   ship(c, e, t, player = false, ghost = false) {
     c.save();
     c.translate(e.x, e.y);
-    c.rotate(e.angle + Math.PI / 2);
+    const seaMotion = this.reducedMotion
+      ? 0
+      : Math.sin(t * 1.65 + e.x * 0.012 + e.y * 0.008) *
+        (this.weather?.waves || 0.35);
+    c.translate(0, seaMotion * 2);
+    c.rotate(e.angle + Math.PI / 2 + seaMotion * 0.025);
+    c.translate(0, (e.recoil || 0) * 15);
+    if (e.sinking !== undefined) {
+      c.globalAlpha = 1 - e.sinking;
+      c.rotate(e.sinking * 0.55);
+      c.scale(1 - e.sinking * 0.48, 1 - e.sinking * 0.65);
+    }
     const profile = player
       ? SHIPS[e.shipId] || SHIPS.sloop
       : ENEMY_TYPES[e.type] || ENEMY_TYPES.raider;
@@ -942,6 +995,21 @@ export class Renderer {
     c.lineTo(0, -33);
     c.fillStyle = player ? "#c7b277" : spectral ? "#bac7dc" : "#bf7159";
     c.fill();
+    if (e.hp / e.maxHp < 0.32 && e.sinking === undefined) {
+      for (let n = 0; n < 3; n++) {
+        const x = (n - 1) * 6,
+          y = 16 - n * 3,
+          flicker = this.reducedMotion ? 2 : Math.sin(t * 9 + n) * 3;
+        c.beginPath();
+        c.moveTo(x - 4, y + 5);
+        c.quadraticCurveTo(x - 6, y - 5, x + flicker, y - 18);
+        c.quadraticCurveTo(x + 8, y - 2, x + 4, y + 5);
+        c.closePath();
+        c.fillStyle = spectral ? "#85cdd4cc" : "#f09b52dd";
+        c.fill();
+        ellipse(c, x, y, 2, 5, spectral ? "#d4f0e5" : "#ffdf89");
+      }
+    }
     c.restore();
   }
   drawBearing(c, s) {

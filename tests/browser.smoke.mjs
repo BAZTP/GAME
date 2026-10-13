@@ -48,6 +48,20 @@ try {
     },
     { key: SAVE_KEY },
   );
+  await page.addInitScript(() => {
+    window.__audioMeters = [];
+    const connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function (target, ...args) {
+      const result = connect.call(this, target, ...args);
+      if (target instanceof AudioDestinationNode) {
+        const meter = this.context.createAnalyser();
+        meter.fftSize = 2048;
+        connect.call(this, meter);
+        window.__audioMeters.push(meter);
+      }
+      return result;
+    };
+  });
   await page.goto(baseURL);
   await page.waitForTimeout(800);
   await page.screenshot({
@@ -115,6 +129,70 @@ try {
     s.player.y = i.y + i.r + 65;
     return s;
   }
+  const weatherState = initialState();
+  weatherState.enemies = [];
+  weatherState.time = 105;
+  await fixture(weatherState);
+  await page.waitForTimeout(200);
+  assert.match(
+    await page.locator("#weather-readout").textContent(),
+    /Tormenta/,
+  );
+  await page.screenshot({ path: "test-results/storm.png", fullPage: true });
+  await page.click("#sound-btn");
+  await page.waitForTimeout(1600);
+  async function audioRms() {
+    return page.evaluate(() => {
+      const meter = window.__audioMeters[0];
+      if (!meter) return 0;
+      const data = new Float32Array(meter.fftSize);
+      meter.getFloatTimeDomainData(data);
+      return Math.sqrt(data.reduce((sum, v) => sum + v * v, 0) / data.length);
+    });
+  }
+  assert.ok((await audioRms()) > 0.0001, "ambient audio reaches output");
+  await page.click("#sound-btn");
+  await page.waitForTimeout(600);
+  assert.ok((await audioRms()) < 0.00001, "mute silences ongoing loops");
+  await page.click("#sound-btn");
+  await page.waitForTimeout(1400);
+  assert.ok((await audioRms()) > 0.0001, "unmute restores ambience");
+  assert.equal(
+    await page.evaluate(() => window.__audioMeters.length),
+    1,
+    "toggles reuse one audio graph",
+  );
+  await page.keyboard.press("Escape");
+  const pausedWeather = await page.locator("#weather-readout").textContent();
+  await page.waitForTimeout(2000);
+  assert.equal(
+    await page.locator("#weather-readout").textContent(),
+    pausedWeather,
+  );
+  assert.ok((await audioRms()) < 0.00001, "pause fades ambient audio");
+  await page.click("#resume-btn");
+  await page.waitForTimeout(400);
+  assert.ok((await audioRms()) > 0.0001);
+  await page.click("#sound-btn");
+  weatherState.time = 240;
+  await fixture(weatherState);
+  await page.waitForTimeout(200);
+  assert.match(await page.locator("#weather-readout").textContent(), /00:00/);
+  await page.screenshot({ path: "test-results/night.png", fullPage: true });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  weatherState.time = 99;
+  await fixture(weatherState);
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(250);
+  await page.screenshot({
+    path: "test-results/reduced-motion.png",
+    fullPage: true,
+  });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  console.log(
+    "PASS realismo: tormenta, noche, movimiento reducido, pausa del reloj y audio real con activación, silencio y reanudación.",
+  );
+
   const fleetState = initialState();
   fleetState.player.gold = 2000;
   fleetState.relics = ["sun", "moon"];
