@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b1020" />
+    <meta
+      name="description"
+      content="Explora NeoCity 2077: una ciudad 3D de neón, personajes con memoria y decisiones que cambian el futuro de la red."
+    />
+    <title>NeoCity 2077 — La ciudad recuerda</title>
+    <link rel="icon" href="./favicon.svg" />
+    <link rel="stylesheet" href="./src/neocity/style.css" />
+  </head>
+  <body>
+    <main id="city">
+      <canvas
+        id="world"
+        tabindex="0"
+        aria-label="Ciudad 3D. WASD o flechas para caminar; Shift para correr; E para interactuar."
+      ></canvas>
+      <div class="screen-shade"></div>
+      <header>
+        <a class="logo" href="./neocity.html"
+          >NEOCITY<span>2077</span><small>LA CIUDAD RECUERDA</small></a
+        >
+        <nav aria-label="Juegos">
+          <a href="./index.html">Piratas 2D</a><a href="./3d.html">Piratas 3D</a
+          ><a href="./neocity.html" aria-current="page">NeoCity</a>
+        </nav>
+        <div class="header-buttons">
+          <button id="ai-settings" title="Conversaciones">
+            ◎ <span id="ai-mode">Diálogo local</span></button
+          ><button id="pause" aria-label="Pausar" disabled>Ⅱ</button>
+        </div>
+      </header>
+      <section id="intro" class="intro">
+        <span class="eyebrow">TRES DISTRITOS. MILLONES DE SECRETOS.</span>
+        <h1>La ciudad<br />te <em>recuerda.</em></h1>
+        <p>
+          Una red a punto de despertar. Seis vidas conectadas a la tuya. ¿A
+          quién confiarás los recuerdos de NeoCity?
+        </p>
+        <div class="features">
+          <span>01 / Explora</span><span>02 / Conversa</span
+          ><span>03 / Decide</span>
+        </div>
+        <button class="primary" id="start" disabled>
+          Conectando con la ciudad…</button
+        ><button class="secondary" id="continue" hidden>
+          Continuar mi historia →</button
+        ><small
+          >Tus decisiones y conversaciones se guardan en este navegador.</small
+        >
+      </section>
+      <div id="hud" hidden>
+        <section class="mission panel">
+          <span class="eyebrow">CAPÍTULO 01 · EL DESPERTAR</span>
+          <h2 id="objective"></h2>
+          <p id="district"></p>
+          <div class="mission-stats">
+            <span id="keys">0 / 3 claves</span><span id="distance"></span>
+          </div>
+        </section>
+        <section class="status panel">
+          <span class="eyebrow">TU HUELLA EN LA CIUDAD</span>
+          <div>
+            <strong id="trust">0</strong><span>Confianza</span
+            ><strong id="credits">40</strong><span>Créditos</span>
+          </div>
+          <label
+            >Resistencia
+            <progress id="energy" max="100" value="100"></progress></label
+          ><small id="save-state">Guardado local</small>
+        </section>
+        <div class="quick">
+          <button id="map-btn">Mapa <kbd>M</kbd></button
+          ><button id="journal-btn">Memoria <kbd>J</kbd></button
+          ><button id="camera-btn">Cámara <kbd>C</kbd></button>
+        </div>
+        <div id="notice" role="status" aria-live="polite"></div>
+        <button class="primary interact" id="interact" hidden>
+          Interactuar <kbd>E</kbd>
+        </button>
+        <div class="controls">
+          WASD / ↑↓←→ <span>Caminar</span> SHIFT <span>Correr</span> E
+          <span>Interactuar</span>
+        </div>
+        <div id="touch" class="touch">
+          <div class="pad">
+            <button data-move="up" aria-label="Avanzar">↑</button
+            ><button data-move="left" aria-label="Izquierda">←</button
+            ><button data-move="down" aria-label="Retroceder">↓</button
+            ><button data-move="right" aria-label="Derecha">→</button>
+          </div>
+          <button data-move="sprint" class="run" aria-label="Correr">
+            ⇧<small>CORRER</small>
+          </button>
+        </div>
+      </div>
+      <section id="unavailable" class="intro" hidden>
+        <span class="eyebrow">CONEXIÓN GRÁFICA INTERRUMPIDA</span>
+        <h1>La ciudad<br />te espera.</h1>
+        <p>
+          Este juego necesita WebGL 2. Prueba un navegador con aceleración
+          gráfica o vuelve a la aventura 2D.
+        </p>
+        <a class="primary" href="./index.html">Jugar a Marea Negra →</a
+        ><button class="secondary" onclick="location.reload()">
+          Reintentar
+        </button>
+      </section>
+      <dialog id="conversation">
+        <div class="dialog-top">
+          <span class="eyebrow" id="npc-role"></span
+          ><button id="close-chat" aria-label="Cerrar conversación">✕</button>
+        </div>
+        <h2 id="npc-name"></h2>
+        <div class="npc-details">
+          <span id="npc-trust"></span
+          ><span id="chat-mode">Diálogo local con memoria</span>
+        </div>
+        <div
+          id="chat-log"
+          class="chat-log"
+          aria-live="polite"
+          aria-label="Conversación"
+        ></div>
+        <div id="choices" class="choices"></div>
+        <form id="chat-form">
+          <label for="message">Habla con este personaje</label>
+          <div class="send-row">
+            <input
+              id="message"
+              maxlength="400"
+              placeholder="¿Qué recuerdas de mí?"
+              autocomplete="off"
+              required
+            /><button class="primary" id="send" type="submit">Enviar →</button>
+          </div>
+        </form>
+        <p class="chat-note" id="chat-note">
+          Motor local: respuestas por temas y recuerdos de tu partida. Las
+          decisiones se toman con los botones.
+        </p>
+      </dialog>
+      <dialog id="modal">
+        <div class="dialog-top">
+          <span class="eyebrow" id="modal-label">NEOCITY / CONEXIÓN</span
+          ><button id="close-modal" aria-label="Cerrar">✕</button>
+        </div>
+        <h2 id="modal-title"></h2>
+        <div id="modal-body"></div>
+      </dialog>
+    </main>
+    <script type="module" src="./src/neocity/main.js"></script>
+  </body>
+</html>

@@ -2,6 +2,12 @@
 
 Una aventura pirata original para navegador, en español. Navega por un archipiélago ilustrado, combate a los corsarios, descubre tesoros y cruza a un mar espectral para recuperar tres reliquias y derrotar al Almirante Hueco.
 
+## Nuevo juego: NeoCity 2077
+
+Desde la barra de ambas versiones de Marea Negra puedes abrir **[NeoCity 2077](https://baztp.github.io/GAME/neocity.html)**: ciudad 3D, seis personajes con memoria, misiones y tres finales. Tiene guardado independiente, mapa, decisiones con consecuencias y controles táctiles.
+
+El modo publicado funciona con **diálogo local por temas y recuerdos**. La conversación generativa requiere conectar el servidor Node a una cuenta de IA; todavía no hay una clave configurada. La arquitectura, los controles y las instrucciones para activar esa conexión están en [NEOCITY.md](NEOCITY.md).
+
 ## Jugar y desarrollar
 
 La versión portátil generada está en **`dist/marea-negra.html`**. Abre ese archivo en un navegador moderno para jugar sin instalar Node.js ni iniciar un servidor. Todo el arte, código y estilos están incluidos. El guardado local depende de que el navegador permita almacenamiento para archivos locales.

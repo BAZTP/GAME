@@ -1,4 +1,6 @@
 import http from "node:http";
+import { createAiHandler } from "./src/neocity/ai-server.mjs";
+const handleAI = createAiHandler();
 import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,6 +20,7 @@ const server = http.createServer(async (req, res) => {
     const path = decodeURIComponent(
       new URL(req.url, "http://localhost").pathname,
     );
+    if (await handleAI(req, res, path)) return;
     const file = resolve(root, "." + (path === "/" ? "/index.html" : path));
     if (
       !file.startsWith(root + sep) ||

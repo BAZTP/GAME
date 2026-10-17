@@ -100,3 +100,46 @@ await writeFile(
 console.log(
   `Travesía 3D preparada: docs/3d.html y dist/3d.html (${Math.round(Buffer.byteLength(previewHtml) / 1024)} KiB).`,
 );
+
+const cityBundle = await build({
+  entryPoints: [resolve(root, "src/neocity/main.js")],
+  bundle: true,
+  write: false,
+  minify: true,
+  format: "iife",
+  target: ["es2022"],
+  legalComments: "inline",
+});
+const cityTemplate = await readFile(resolve(root, "neocity.html"), "utf8");
+const cityCss = await readFile(resolve(root, "src/neocity/style.css"), "utf8");
+const cityHtml = cityTemplate
+  .replace(
+    /<link\s+rel="stylesheet"\s+href=".\/src\/neocity\/style.css"\s*\/?\s*>/,
+    () => `<style>${cityCss}</style>`,
+  )
+  .replace(
+    '<script type="module" src="./src/neocity/main.js"></script>',
+    () =>
+      `<script>${cityBundle.outputFiles[0].text.replace(/<\/script/gi, "<\\/script")}</script>`,
+  )
+  .replace(
+    'href="./favicon.svg"',
+    `href="data:image/svg+xml,${encodeURIComponent(favicon)}"`,
+  )
+  .replace(
+    "</head>",
+    () => `<!-- Three.js license\n${threeLicense}-->\n</head>`,
+  );
+if (
+  cityHtml.includes('src="./src/neocity/') ||
+  cityHtml.includes('href="./src/neocity/')
+)
+  throw new Error("Faltan recursos en NeoCity.");
+await writeFile(resolve(root, "docs/neocity.html"), cityHtml);
+await writeFile(
+  resolve(root, "dist/neocity.html"),
+  cityHtml.replaceAll('href="./index.html"', 'href="./marea-negra.html"'),
+);
+console.log(
+  `NeoCity 2077 preparado: docs/neocity.html (${Math.round(Buffer.byteLength(cityHtml) / 1024)} KiB).`,
+);
