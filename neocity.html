@@ -32,21 +32,30 @@
           ><a href="./neocity.html" aria-current="page">NeoCity</a>
         </nav>
         <div class="header-buttons">
+          <button
+            id="graphics"
+            aria-label="Ajustes gráficos"
+            title="Ajustes gráficos"
+          >
+            ⚙
+          </button>
           <button id="ai-settings" title="Conversaciones">
             ◎ <span id="ai-mode">Diálogo local</span></button
           ><button id="pause" aria-label="Pausar" disabled>Ⅱ</button>
         </div>
       </header>
       <section id="intro" class="intro">
-        <span class="eyebrow">TRES DISTRITOS. MILLONES DE SECRETOS.</span>
+        <span class="eyebrow"
+          ><i class="signal-dot"></i> AVENTURA URBANA · 2077</span
+        >
         <h1>La ciudad<br />te <em>recuerda.</em></h1>
         <p>
           Una red a punto de despertar. Seis vidas conectadas a la tuya. ¿A
           quién confiarás los recuerdos de NeoCity?
         </p>
         <div class="features">
-          <span>01 / Explora</span><span>02 / Conversa</span
-          ><span>03 / Decide</span>
+          <span><b>01</b> Explora</span><span><b>02</b> Conversa</span
+          ><span><b>03</b> Decide</span>
         </div>
         <button class="primary" id="start" disabled>
           Conectando con la ciudad…</button
@@ -57,14 +66,26 @@
         >
       </section>
       <div id="hud" hidden>
-        <section class="mission panel">
-          <span class="eyebrow">CAPÍTULO 01 · EL DESPERTAR</span>
-          <h2 id="objective"></h2>
-          <p id="district"></p>
-          <div class="mission-stats">
-            <span id="keys">0 / 3 claves</span><span id="distance"></span>
+        <div class="navigation-hud">
+          <section class="mission panel">
+            <span class="eyebrow" id="chapter"
+              >HISTORIA PRINCIPAL · EL DESPERTAR</span
+            >
+            <h2 id="objective"></h2>
+            <p id="district"></p>
+            <div class="mission-stats">
+              <span id="keys">0 / 3 claves</span><span id="distance"></span>
+            </div>
+            <div class="mission-track" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+          </section>
+          <div class="quick">
+            <button id="map-btn">Mapa <kbd>M</kbd></button
+            ><button id="journal-btn">Memoria <kbd>J</kbd></button
+            ><button id="camera-btn">Cámara <kbd>C</kbd></button>
           </div>
-        </section>
+        </div>
         <section class="status panel">
           <span class="eyebrow">TU HUELLA EN LA CIUDAD</span>
           <div>
@@ -76,11 +97,20 @@
             <progress id="energy" max="100" value="100"></progress></label
           ><small id="save-state">Guardado local</small>
         </section>
-        <div class="quick">
-          <button id="map-btn">Mapa <kbd>M</kbd></button
-          ><button id="journal-btn">Memoria <kbd>J</kbd></button
-          ><button id="camera-btn">Cámara <kbd>C</kbd></button>
-        </div>
+        <button
+          id="radar-btn"
+          class="radar panel"
+          aria-label="Abrir mapa de la ciudad"
+        >
+          <span class="radar-label"><span>RADAR LOCAL</span><b>N ↑</b></span>
+          <canvas
+            id="radar"
+            width="240"
+            height="200"
+            aria-hidden="true"
+          ></canvas>
+          <span class="radar-caption">Tu posición <i></i> Objetivo</span>
+        </button>
         <div id="notice" role="status" aria-live="polite"></div>
         <button class="primary interact" id="interact" hidden>
           Interactuar <kbd>E</kbd>
@@ -118,7 +148,30 @@
           <span class="eyebrow" id="npc-role"></span
           ><button id="close-chat" aria-label="Cerrar conversación">✕</button>
         </div>
-        <h2 id="npc-name"></h2>
+        <div class="npc-heading">
+          <div id="npc-portrait" aria-hidden="true">
+            <svg viewBox="0 0 80 80">
+              <path
+                class="portrait-body"
+                d="M8 80V65Q10 53 29 51L40 59 51 51Q70 53 72 65V80"
+              />
+              <path
+                class="portrait-face"
+                d="M24 20Q40 4 56 20V38Q53 54 40 56 27 54 24 38Z"
+              />
+              <path
+                class="portrait-hair"
+                d="M20 29V20Q22 3 41 5 60 5 61 26L53 24 49 16 23 32Z"
+              />
+              <path class="portrait-visor" d="M23 29H57V37H23Z" />
+              <path class="portrait-detail" d="M29 65L39 72 51 63M33 44H45" />
+            </svg>
+          </div>
+          <div>
+            <span class="eyebrow">ENLACE PERSONAL</span>
+            <h2 id="npc-name"></h2>
+          </div>
+        </div>
         <div class="npc-details">
           <span id="npc-trust"></span
           ><span id="chat-mode">Diálogo local con memoria</span>

@@ -156,6 +156,8 @@ function renderChat() {
   const m = state.memories[npcId],
     npc = NPCS.find((n) => n.id === npcId);
   $("npc-name").textContent = npc.name;
+  chat.style.setProperty("--npc-color", npc.color);
+  $("npc-portrait").dataset.person = npc.id;
   $("npc-role").textContent = npc.role.toUpperCase();
   $("npc-trust").textContent =
     `Confianza personal: ${m.trust} · Encuentros: ${m.visits}`;
@@ -247,6 +249,111 @@ function showMap() {
     "▲ Tú · círculos: personajes · rombos: objetos · dorado: tu objetivo. El mapa señala lugares; recorre las calles para llegar.",
   );
   drawMap();
+}
+function drawRadar() {
+  const c = $("radar").getContext("2d"),
+    p = state.player,
+    zoom = 1.2;
+  const x = (v) => 120 + (v - p.x) * zoom,
+    z = (v) => 100 + (v - p.z) * zoom;
+  c.fillStyle = "#0b1927";
+  c.fillRect(0, 0, 240, 200);
+  c.strokeStyle = "#20384b";
+  c.lineWidth = 1;
+  for (let n = -180; n <= 180; n += 25) {
+    c.beginPath();
+    c.moveTo(x(n), 0);
+    c.lineTo(x(n), 200);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, z(n));
+    c.lineTo(240, z(n));
+    c.stroke();
+  }
+  for (const b of BUILDINGS) {
+    c.fillStyle = b.x < 0 ? "#3e344f" : "#234c4e";
+    c.fillRect(x(b.x - b.w / 2), z(b.z - b.d / 2), b.w * zoom, b.d * zoom);
+  }
+  for (const n of NPCS) {
+    c.fillStyle = n.color;
+    c.beginPath();
+    c.arc(x(n.x), z(n.z), 3, 0, Math.PI * 2);
+    c.fill();
+  }
+  const t = objective(state).target;
+  const tx = Math.max(10, Math.min(230, x(t.x))),
+    tz = Math.max(10, Math.min(190, z(t.z)));
+  c.strokeStyle = "#ffd18b";
+  c.lineWidth = 2;
+  c.beginPath();
+  c.arc(tx, tz, 6, 0, Math.PI * 2);
+  c.stroke();
+  c.save();
+  c.translate(120, 100);
+  c.rotate(state.player.heading);
+  c.fillStyle = "#edfffa";
+  c.shadowColor = "#83f4df";
+  c.shadowBlur = 8;
+  c.beginPath();
+  c.moveTo(0, -8);
+  c.lineTo(5, 6);
+  c.lineTo(0, 3);
+  c.lineTo(-5, 6);
+  c.closePath();
+  c.fill();
+  c.restore();
+}
+function showGraphics() {
+  if (!scene || failed) return;
+  const body = openModal("Tu forma de ver NeoCity");
+  paragraph(
+    body,
+    "Elige el nivel de detalle para tu pantalla. Puedes cambiarlo en cualquier momento.",
+  );
+  const group = document.createElement("div");
+  group.className = "quality-options";
+  body.append(group);
+  for (const [value, title, detail] of [
+    [
+      "performance",
+      "Fluido",
+      "Menor resolución, sin lluvia ni halos sobre el suelo.",
+    ],
+    [
+      "balanced",
+      "Equilibrado",
+      "Luces ambientales y lluvia con resolución moderada.",
+    ],
+    [
+      "high",
+      "Nítido",
+      "Mayor resolución para pantallas de alta densidad. Requiere más potencia.",
+    ],
+  ]) {
+    const b = button(
+      group,
+      "",
+      () => {
+        scene.setQuality(value);
+        try {
+          localStorage.setItem("neocity-quality", value);
+        } catch {}
+        for (const option of group.children)
+          option.setAttribute("aria-pressed", String(option === b));
+      },
+      "quality-option",
+    );
+    b.setAttribute("aria-pressed", String(scene.quality === value));
+    const strong = document.createElement("strong"),
+      small = document.createElement("small");
+    strong.textContent = title;
+    small.textContent = detail;
+    b.append(strong, small);
+  }
+  paragraph(
+    body,
+    "Si has activado reducir movimiento en tu dispositivo, se respeta también en la ciudad.",
+  );
 }
 function drawMap() {
   if (!mapCanvas) return;
@@ -391,6 +498,14 @@ function refresh() {
   $("objective").textContent = o.text;
   $("district").textContent = districtAt(state.player).name;
   $("keys").textContent = `${state.completed.length} / 3 claves`;
+  $("chapter").textContent = state.ending
+    ? "HISTORIA COMPLETADA · EXPLORACIÓN LIBRE"
+    : "HISTORIA PRINCIPAL · EL DESPERTAR";
+  document
+    .querySelectorAll(".mission-track i")
+    .forEach((el, i) =>
+      el.classList.toggle("complete", i < state.completed.length),
+    );
   $("distance").textContent = `${Math.round(dist(state.player, o.target))} m`;
   $("trust").textContent = state.trust;
   $("credits").textContent = state.credits;
@@ -402,6 +517,7 @@ function refresh() {
     : "";
   if (performance.now() > noticeUntil) $("notice").textContent = "";
   if (mapCanvas) drawMap();
+  if (started && matchMedia("(min-width: 701px)").matches) drawRadar();
 }
 function fail() {
   failed = true;
@@ -420,6 +536,8 @@ $("continue").onclick = () => start(true);
 $("pause").onclick = showPause;
 $("interact").onclick = interact;
 $("map-btn").onclick = showMap;
+$("radar-btn").onclick = showMap;
+$("graphics").onclick = showGraphics;
 $("journal-btn").onclick = showJournal;
 $("ai-settings").onclick = showSettings;
 $("camera-btn").onclick = () => {
@@ -526,7 +644,10 @@ function frame(now) {
     for (let remaining = dt; remaining > 0; remaining -= 0.05)
       updateCity(state, Math.min(remaining, 0.05), input);
     drain();
-    scene.draw(state, dt, objective(state).target);
+    if (state.active || scene.needsRender) {
+      scene.draw(state, dt, objective(state).target);
+      scene.needsRender = false;
+    }
     uiClock += dt;
     if (state.active) saveClock += dt;
     if (uiClock > 0.12) {

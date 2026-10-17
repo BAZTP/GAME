@@ -1,5 +1,6 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
 import { NPCS, PICKUPS, BUILDINGS, dist } from "./world.js";
+import { asphalt, cityDetails, batchStaticBoxes } from "./visuals.js";
 const material = (color, glow = false) =>
   new THREE.MeshStandardMaterial({
     color,
@@ -9,6 +10,44 @@ const material = (color, glow = false) =>
     emissiveIntensity: glow ? 2 : 0,
   });
 const cache = new Map();
+const suitMaterial = new THREE.MeshStandardMaterial({
+  vertexColors: true,
+  roughness: 0.62,
+  metalness: 0.25,
+});
+function mergeSuit(group, limbs) {
+  const positions = [],
+    normals = [],
+    colors = [];
+  for (const mesh of [...group.children]) {
+    if (limbs.includes(mesh)) continue;
+    mesh.updateMatrix();
+    const transformed = mesh.geometry.clone().applyMatrix4(mesh.matrix);
+    const geometry = transformed.index
+      ? transformed.toNonIndexed()
+      : transformed;
+    const p = geometry.getAttribute("position"),
+      n = geometry.getAttribute("normal"),
+      color = mesh.material.color;
+    for (let i = 0; i < p.count; i++) {
+      positions.push(p.getX(i), p.getY(i), p.getZ(i));
+      normals.push(n.getX(i), n.getY(i), n.getZ(i));
+      colors.push(color.r, color.g, color.b);
+    }
+    group.remove(mesh);
+    mesh.geometry.dispose();
+    geometry.dispose();
+    if (geometry !== transformed) transformed.dispose();
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  group.add(new THREE.Mesh(geometry, suitMaterial));
+}
 function mat(color, glow = false) {
   const key = color + glow;
   if (!cache.has(key)) cache.set(key, material(color, glow));
@@ -58,14 +97,24 @@ function avatar(color) {
   );
   head.position.y = 2.2;
   g.add(head);
+  const helmet = new THREE.Mesh(
+    new THREE.SphereGeometry(0.34, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.57),
+    mat("#26384c"),
+  );
+  helmet.position.y = 2.24;
+  g.add(helmet);
+  cube(g, 0.9, 0.14, 0.54, "#334759", 0, 0.93, 0);
+  cube(g, 0.48, 0.66, 0.24, "#26384c", 0, 1.35, 0.33);
   cube(g, 0.47, 0.12, 0.22, "#79f7ef", 0, 2.23, -0.25, true);
   const limbs = [];
   for (const sign of [-1, 1]) {
     const leg = cube(g, 0.28, 0.85, 0.32, "#142032", sign * 0.24, 0.44, 0);
     const arm = cube(g, 0.23, 0.9, 0.25, color, sign * 0.58, 1.3, 0);
     limbs.push(leg, arm);
+    cube(g, 0.32, 0.18, 0.48, "#26384c", sign * 0.24, 0.1, -0.06);
   }
   g.userData.limbs = limbs;
+  mergeSuit(g, limbs);
   return g;
 }
 export class CityScene {
@@ -85,8 +134,8 @@ export class CityScene {
     this.renderer.shadowMap.enabled = false;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color("#090c22");
-    this.scene.fog = new THREE.FogExp2("#0e162b", 0.008);
+    this.scene.background = new THREE.Color("#1a2943");
+    this.scene.fog = new THREE.FogExp2("#253950", 0.0055);
     this.camera = new THREE.PerspectiveCamera(55, 1, 0.2, 600);
     this.scene.add(new THREE.HemisphereLight("#929bd8", "#39455e", 3.2));
     const sun = new THREE.DirectionalLight("#a1bcf3", 2);
@@ -102,9 +151,12 @@ export class CityScene {
     });
     sun.shadow.bias = -0.001;
     this.scene.add(sun);
-    cube(this.scene, 410, 0.5, 410, "#111b2b", 0, -0.3, 0);
+    cube(this.scene, 410, 0.5, 410, "#253545", 0, -0.3, 0);
+    const northRoad = asphalt(),
+      eastRoad = asphalt(true);
     for (const x of [-150, -75, 0, 75, 150]) {
-      cube(this.scene, 17, 0.035, 340, "#091322", x, 0.02, 0);
+      cube(this.scene, 17, 0.035, 340, "#091322", x, 0.02, 0).material =
+        northRoad;
       for (const side of [-1, 1])
         cube(
           this.scene,
@@ -121,7 +173,8 @@ export class CityScene {
         cube(this.scene, 0.13, 0.04, 3, "#768b9d", x, 0.07, z);
     }
     for (const z of [-105, -35, 35, 105]) {
-      cube(this.scene, 340, 0.04, 14, "#0b1728", 0, 0.065, z);
+      cube(this.scene, 340, 0.04, 14, "#0b1728", 0, 0.065, z).material =
+        eastRoad;
       for (let x = -150; x < 155; x += 12)
         cube(this.scene, 3, 0.04, 0.13, "#768b9d", x, 0.09, z);
     }
@@ -236,8 +289,17 @@ export class CityScene {
       this.scene.add(plant);
       this.plants.push(plant);
     }
+    this.details = cityDetails(this.scene);
+    batchStaticBoxes(this.scene);
     this.player = avatar("#d3dce8");
     this.scene.add(this.player);
+    const contact = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.8, 3.8),
+      this.details.shadow,
+    );
+    contact.rotation.x = -Math.PI / 2;
+    contact.position.y = 0.16;
+    this.player.add(contact);
     this.npcs = new Map();
     for (const n of NPCS) {
       const model = avatar(n.color);
@@ -251,6 +313,8 @@ export class CityScene {
       model.add(name);
       this.npcs.set(n.id, model);
       this.scene.add(model);
+      const shadow = contact.clone();
+      model.add(shadow);
       const ring = new THREE.Mesh(
         new THREE.RingGeometry(1.3, 1.5, 24),
         new THREE.MeshBasicMaterial({
@@ -301,6 +365,18 @@ export class CityScene {
       const g = new THREE.Group();
       cube(g, 2.5, 0.8, 5, "#263849", 0, 0.9, 0);
       cube(g, 2, 0.65, 2, "#367282", 0, 1.5, 0.5);
+      cube(g, 2.1, 0.1, 1.7, "#111e2e", 0, 1.87, 0.45);
+      cube(g, 2.45, 0.12, 4.3, i % 2 ? "#ff7091" : "#86e9ec", 0, 0.56, 0, true);
+      for (const side of [-1, 1])
+        for (const z of [-1.5, 1.5]) {
+          const wheel = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.45, 0.45, 0.25, 12),
+            mat("#0e1723"),
+          );
+          wheel.rotation.z = Math.PI / 2;
+          wheel.position.set(side * 1.25, 0.6, z);
+          g.add(wheel);
+        }
       for (const x of [-0.8, 0.8])
         cube(g, 0.4, 0.2, 0.1, i % 2 ? "#ff7091" : "#86e9ec", x, 1, -2.6, true);
       this.scene.add(g);
@@ -338,9 +414,29 @@ export class CityScene {
     this.cameraPos = new THREE.Vector3();
     this.lastX = 0;
     this.lastZ = 0;
+    let quality = "balanced";
+    try {
+      quality = localStorage.getItem("neocity-quality") || quality;
+    } catch {}
+    this.setQuality(quality);
+    this.resize();
+  }
+  setQuality(value) {
+    this.quality = ["performance", "balanced", "high"].includes(value)
+      ? value
+      : "balanced";
+    this.renderer.setPixelRatio(
+      Math.min(
+        devicePixelRatio,
+        { performance: 0.8, balanced: 1.25, high: 2 }[this.quality],
+      ),
+    );
+    this.details.effects.visible = this.quality !== "performance";
+    this.canvas.dataset.quality = this.quality;
     this.resize();
   }
   resize() {
+    this.needsRender = true;
     const r = this.canvas.getBoundingClientRect();
     this.renderer.setSize(r.width, r.height, false);
     this.camera.aspect = r.width / r.height;
@@ -348,6 +444,7 @@ export class CityScene {
     this.camera.updateProjectionMatrix();
   }
   snap(p) {
+    this.needsRender = true;
     this.cameraPos.set(p.x + 11, 22, p.z + 27);
     this.camera.position.copy(this.cameraPos);
     this.camera.lookAt(p.x, 2, p.z - 9);
@@ -420,7 +517,7 @@ export class CityScene {
           s.completed.includes("garden") ? "#76ffc4" : "#53c69b",
         )),
     );
-    this.rain.visible = !this.reduced;
+    this.rain.visible = !this.reduced && this.quality !== "performance";
     this.rain.position.set(p.x, 0, p.z);
     const rp = this.rainGeo.attributes.position;
     for (let i = 0; i < rp.count; i++)

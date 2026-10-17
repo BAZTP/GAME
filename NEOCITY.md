@@ -14,6 +14,14 @@ NeoCity es un segundo juego independiente, accesible desde el enlace **NeoCity**
 
 WASD o flechas: caminar. Shift: correr. E: hablar o recoger. M: mapa. J: memoria. C: distancia de cámara. Escape: pausa o cerrar ventana. En pantallas táctiles aparecen flechas y un botón para correr. El mapa orienta, pero no teletransporta al personaje.
 
+## Gráficos e interfaz
+
+La ciudad incluye asfalto con textura generada, fachadas con bandas y ventanas laterales, escaparates, equipos de azotea, farolas, bancos y pasos peatonales. Los personajes tienen cascos y equipo; los vehículos incorporan ruedas, techo y franjas luminosas. Los halos de luz sobre el suelo y las sombras de contacto son efectos estilizados, sin trazado de rayos ni reflejos en tiempo real.
+
+La interfaz muestra objetivos y progreso, retratos en las conversaciones y un radar local en escritorio que abre el mapa al pulsarlo. En móvil, los accesos al mapa, la memoria y la cámara quedan debajo del objetivo. Los controles de conversación usan texto más grande.
+
+El botón de ajustes gráficos permite elegir **Fluido**, **Equilibrado** o **Nítido**. Fluido reduce la resolución y desactiva lluvia y halos; Nítido admite mayor resolución en pantallas de alta densidad. La elección se guarda en este navegador, aparte de la partida. Se respetan las preferencias de movimiento reducido. Los elementos estáticos y las piezas de los personajes se agrupan para reducir las operaciones de dibujo, y la escena deja de redibujarse continuamente cuando está pausada.
+
 ## Conversaciones: dos modos distintos
 
 **Diálogo local con memoria** está disponible en GitHub Pages y sin conexión después de cargar el HTML. Es un motor de respuestas por temas, personalidad, confianza y decisiones de la partida. **No es un modelo de lenguaje generativo.** La interfaz lo identifica expresamente. Se puede preguntar por la misión, la ciudad, Helix, el futuro y los recuerdos del personaje.

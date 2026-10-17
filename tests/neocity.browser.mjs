@@ -13,6 +13,25 @@ const server = process.env.TEST_BASE_URL
       stdio: "ignore",
     });
 let browser;
+// Release movement in the browser at the first interaction prompt. Software
+// WebGL can delay the round trip to Node long enough to walk past a character.
+async function stopAtPrompt(page, touch = false) {
+  await page.evaluate((touch) => {
+    window.__walkStopped = false;
+    const prompt = document.querySelector("#interact");
+    const observer = new MutationObserver(() => {
+      if (prompt.hidden) return;
+      if (touch)
+        document
+          .querySelector('[data-move="up"]')
+          .dispatchEvent(new PointerEvent("pointerup"));
+      else window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
+      window.__walkStopped = true;
+      observer.disconnect();
+    });
+    observer.observe(prompt, { attributes: true, attributeFilter: ["hidden"] });
+  }, touch);
+}
 try {
   let ready = false;
   for (let n = 0; n < 40; n++) {
@@ -46,9 +65,30 @@ try {
   await page.waitForSelector('#world[data-rendered="true"]');
   assert.equal(await page.locator("#ai-mode").textContent(), "Diálogo local");
   await page.screenshot({ path: "test-results/neocity-intro.png" });
+  await page.click("#graphics");
+  await page.getByRole("button", { name: /Fluido/ }).click();
+  assert.equal(
+    await page.locator("#world").getAttribute("data-quality"),
+    "performance",
+  );
+  await page.click("#close-modal");
+  await page.reload();
+  await page.waitForSelector('#world[data-rendered="true"]');
+  assert.equal(
+    await page.locator("#world").getAttribute("data-quality"),
+    "performance",
+  );
+  await page.click("#graphics");
+  await page.getByRole("button", { name: /Equilibrado/ }).click();
+  await page.click("#close-modal");
   await page.click("#start");
+  await page.click("#radar-btn");
+  assert.ok(await page.locator(".map-canvas").isVisible());
+  await page.click("#close-modal");
+  await page.screenshot({ path: "test-results/neocity-game.png" });
+  await stopAtPrompt(page);
   await page.keyboard.down("KeyW");
-  await page.waitForSelector("#interact:not([hidden])", { timeout: 20000 });
+  await page.waitForFunction(() => window.__walkStopped, { timeout: 20000 });
   await page.keyboard.up("KeyW");
   await page.click("#interact");
   assert.equal(await page.locator("#npc-name").textContent(), "Luna Vex");
@@ -182,10 +222,11 @@ try {
   await phone.goto(`${base}/docs/neocity.html`);
   await phone.waitForSelector('#world[data-rendered="true"]');
   await phone.tap("#start");
+  await stopAtPrompt(phone, true);
   const up = await phone.locator('[data-move="up"]').boundingBox();
   await phone.mouse.move(up.x + up.width / 2, up.y + up.height / 2);
   await phone.mouse.down();
-  await phone.waitForSelector("#interact:not([hidden])", { timeout: 20000 });
+  await phone.waitForFunction(() => window.__walkStopped, { timeout: 20000 });
   await phone.mouse.up();
   await phone.tap("#interact");
   await phone.fill("#message", "hola");
@@ -204,6 +245,18 @@ try {
       ),
       false,
     );
+    const layout = await phone.evaluate(() => {
+      const mission = document
+        .querySelector(".mission")
+        .getBoundingClientRect();
+      const actions = document.querySelector(".quick").getBoundingClientRect();
+      return { missionBottom: mission.bottom, actionsTop: actions.top };
+    });
+    if (width <= 700)
+      assert.ok(
+        layout.actionsTop >= layout.missionBottom,
+        "Mission and actions do not overlap",
+      );
   }
   await phone.close();
   console.log(

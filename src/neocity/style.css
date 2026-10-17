@@ -1,5 +1,5 @@
 :root {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
   color: #e5e8f5;
   background: #0b1020;
   color-scheme: dark;
@@ -78,7 +78,8 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  background: #0b1020ec;
+  background: linear-gradient(180deg, #0b1423f5, #0b1423dd);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
 .logo {
@@ -205,16 +206,19 @@ p {
 }
 .intro > small {
   display: block;
-  color: #7f90ad;
+  color: #a1b4cb;
   font-size: 9px;
   line-height: 1.5;
   margin-top: 16px;
 }
 .panel {
-  background: #0c1529ed;
+  background: linear-gradient(135deg, #102334ed, #101a2de8);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--line);
-  border-radius: 4px;
-  box-shadow: 0 10px 30px #0002;
+  border-radius: 12px;
+  box-shadow:
+    0 12px 30px #0003,
+    inset 0 1px #ffffff08;
 }
 .mission {
   position: absolute;
@@ -344,10 +348,10 @@ kbd {
 }
 dialog {
   color: #dfe7f4;
-  background: #10182a;
+  background: linear-gradient(145deg, #142739, #0d1729);
   border: 1px solid #90a2c755;
-  border-radius: 6px;
-  width: min(600px, calc(100% - 28px));
+  border-radius: 18px;
+  width: min(640px, calc(100% - 28px));
   max-height: 88svh;
   padding: 26px;
   box-shadow: 0 30px 100px #0009;
@@ -381,7 +385,7 @@ dialog h2 {
   margin: 0 0 18px;
 }
 .chat-log {
-  height: 220px;
+  height: 240px;
   overflow: auto;
   overscroll-behavior: contain;
   border-block: 1px solid var(--line);
@@ -393,8 +397,8 @@ dialog h2 {
   background: #17273a;
   border-radius: 4px;
   margin: 8px 30px 8px 0;
-  font-size: 12px;
-  line-height: 1.65;
+  font-size: 14px;
+  line-height: 1.7;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -445,7 +449,7 @@ dialog h2 {
 }
 .chat-note {
   font-size: 10px;
-  color: #7c91ad;
+  color: #a1b4cb;
   margin: 14px 0 0;
 }
 .memory-list {
@@ -736,5 +740,573 @@ dialog h2 {
   * {
     scroll-behavior: auto !important;
     transition: none !important;
+  }
+}
+
+/* The HUD leaves the streets clear and groups actions by purpose. */
+button,
+nav a {
+  transition:
+    background 0.16s,
+    border-color 0.16s,
+    box-shadow 0.16s;
+}
+button:hover:not(:disabled) {
+  border-color: #a7e5df88;
+  background-color: #20394a;
+}
+button.primary:hover {
+  background: #b1ffe9;
+}
+button {
+  border-radius: 8px;
+}
+header {
+  min-height: 78px;
+  padding-block: 12px;
+}
+nav {
+  padding: 4px;
+  background: #030b1666;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+nav a {
+  border-radius: 6px;
+}
+#graphics {
+  min-width: 38px;
+  font-size: 18px;
+  padding: 7px;
+}
+#ai-settings {
+  font-size: 11px;
+}
+.screen-shade {
+  background: linear-gradient(
+    180deg,
+    #07101c44,
+    transparent 25%,
+    transparent 68%,
+    #050e2266
+  );
+}
+.intro {
+  border-radius: 0 22px 22px 0;
+  padding: 38px;
+  width: 450px;
+  background: linear-gradient(120deg, #0b1d2af5, #112338e8);
+  border-left: 3px solid var(--cyan);
+}
+.intro h1 {
+  font-size: 66px;
+  letter-spacing: -3.5px;
+}
+.intro p {
+  font-size: 15px;
+  color: #c0d0df;
+}
+.intro .primary {
+  font-size: 14px;
+  min-height: 52px;
+  border-radius: 8px;
+  box-shadow: 0 5px 24px #83f4df20;
+}
+.intro > small {
+  font-size: 11px;
+}
+.features {
+  font-size: 12px;
+  color: #c5d5e5;
+  gap: 12px;
+}
+.features b {
+  display: block;
+  font: 11px monospace;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+.signal-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px #83f4df;
+  margin-right: 6px;
+}
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 1.6px;
+}
+.mission {
+  width: 300px;
+  top: 103px;
+  border-top: 2px solid var(--cyan);
+}
+.mission h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+.mission p {
+  font-size: 12px;
+}
+.mission-stats {
+  font-size: 11px;
+  color: #b4c6d7;
+}
+.mission-track {
+  display: flex;
+  gap: 5px;
+  margin-top: 14px;
+}
+.mission-track i {
+  height: 3px;
+  background: #58788c55;
+  flex: 1;
+  border-radius: 3px;
+}
+.mission-track i.complete {
+  background: var(--cyan);
+  box-shadow: 0 0 9px #83f4df66;
+}
+.status {
+  width: 275px;
+  bottom: 26px;
+}
+.status strong {
+  font-weight: 600;
+  font-size: 25px;
+}
+.status > div span,
+.status label {
+  font-size: 11px;
+}
+.status small {
+  font-size: 10px;
+  color: #a0c5bb;
+}
+.quick {
+  top: 103px;
+}
+.quick button {
+  min-height: 42px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: #102334ed;
+}
+.quick kbd {
+  font-size: 10px;
+  color: #c5d7e2;
+}
+.radar {
+  position: absolute;
+  right: 28px;
+  bottom: 26px;
+  width: 210px;
+  padding: 12px;
+  overflow: hidden;
+  text-align: left;
+}
+.radar-label {
+  display: flex;
+  justify-content: space-between;
+  font: 9px monospace;
+  letter-spacing: 1px;
+  color: #b5cbd7;
+  margin-bottom: 9px;
+}
+.radar-label b {
+  color: var(--cyan);
+}
+#radar {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+}
+.radar-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #a6bdcd;
+  margin-top: 9px;
+}
+.radar-caption i {
+  border: 1px solid #ffd18b;
+  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: 8px;
+}
+#notice:not(:empty) {
+  background: #102334ed;
+  padding: 10px 18px;
+  border: 1px solid #b8d9e333;
+  border-radius: 20px;
+  top: auto;
+  bottom: 76px;
+  font-size: 12px;
+  color: #e1ebf2;
+}
+.interact {
+  bottom: 145px;
+  min-height: 48px;
+  border-radius: 24px;
+  font-size: 14px;
+}
+.controls {
+  font-size: 10px;
+  bottom: 32px;
+}
+.controls span {
+  margin-right: 12px;
+}
+.npc-heading {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin: 20px 0;
+}
+.npc-heading h2 {
+  margin: 4px 0 0;
+  font-size: 32px;
+  font-weight: 650;
+  letter-spacing: -1px;
+}
+#npc-portrait {
+  width: 76px;
+  height: 80px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--npc-color, #83f4df);
+  border-radius: 14px;
+  background: radial-gradient(ellipse at bottom, #425467, #172737);
+}
+#npc-portrait svg {
+  width: 100%;
+  height: 100%;
+}
+.portrait-body {
+  fill: var(--npc-color, #83f4df);
+  opacity: 0.8;
+}
+.portrait-face {
+  fill: #b7a4a5;
+}
+.portrait-hair {
+  fill: #18212e;
+}
+.portrait-visor {
+  fill: var(--npc-color, #83f4df);
+}
+.portrait-detail {
+  fill: none;
+  stroke: #192c3a;
+  stroke-width: 2;
+}
+#npc-portrait[data-person="echo"] .portrait-face,
+#npc-portrait[data-person="atlas"] .portrait-face {
+  fill: #658997;
+}
+#npc-portrait[data-person="iris"] .portrait-hair {
+  fill: #79586b;
+}
+#npc-portrait[data-person="vera"] .portrait-hair {
+  fill: #b9c4db;
+}
+.npc-details {
+  font-size: 11px;
+  flex-wrap: wrap;
+  line-height: 1.5;
+}
+#chat-mode {
+  color: var(--npc-color, #83f4df);
+}
+.bubble {
+  border-radius: 0 12px 12px 12px;
+  background: #203649;
+  border-left: 2px solid var(--npc-color, #83f4df);
+}
+.bubble.user {
+  background: #294146;
+  border: none;
+  border-radius: 12px 0 12px 12px;
+}
+.choices button {
+  font-size: 12px;
+  padding: 12px;
+  margin-top: 0;
+}
+#chat-form label {
+  font-size: 12px;
+}
+.send-row input {
+  font-size: 14px;
+  border-radius: 8px;
+}
+.chat-note {
+  font-size: 11px;
+}
+.dialog-top > button {
+  min-height: 36px;
+  min-width: 36px;
+}
+.quality-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+.quality-option {
+  text-align: left;
+  padding: 16px;
+}
+.quality-option strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.quality-option small {
+  display: block;
+  color: #b1c5d6;
+  line-height: 1.6;
+}
+.quality-option[aria-pressed="true"] {
+  border-color: var(--cyan);
+  background: #83f4df14;
+}
+.quality-option[aria-pressed="true"] strong::after {
+  content: " · ACTIVO";
+  color: var(--cyan);
+  font-size: 10px;
+}
+@media (max-width: 1100px) {
+  .controls {
+    display: none;
+  }
+  .radar {
+    width: 175px;
+    right: 18px;
+  }
+  .mission {
+    width: 260px;
+  }
+  #notice:not(:empty) {
+    bottom: 220px;
+  }
+  .interact {
+    bottom: 280px;
+  }
+}
+@media (pointer: coarse) {
+  .radar {
+    bottom: 130px;
+  }
+  .status {
+    bottom: 135px;
+  }
+}
+@media (max-width: 700px) {
+  header {
+    padding: 10px 12px;
+  }
+  .header-buttons {
+    gap: 5px;
+  }
+  .header-buttons button {
+    min-width: 32px;
+    width: 32px;
+    padding: 6px;
+  }
+  .logo {
+    letter-spacing: 2px;
+    font-size: 16px;
+  }
+  .logo > span {
+    margin-left: 5px;
+  }
+  header nav {
+    padding: 2px;
+  }
+  nav a {
+    padding: 6px 14px;
+  }
+  .intro {
+    left: 14px;
+    right: 14px;
+    width: auto;
+    bottom: 20px;
+    padding: 26px;
+    border-radius: 16px;
+  }
+  .intro h1 {
+    font-size: 48px;
+    letter-spacing: -2px;
+  }
+  .intro p {
+    font-size: 13px;
+  }
+  .intro .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .features {
+    margin: 16px 0;
+    padding: 16px 0;
+    font-size: 11px;
+  }
+  .mission {
+    top: 119px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    padding: 14px 16px;
+  }
+  .mission h2 {
+    font-size: 17px;
+    margin: 8px 0;
+  }
+  .mission .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .mission p {
+    font-size: 11px;
+  }
+  .mission-stats {
+    margin-top: 8px;
+    padding-top: 8px;
+    font-size: 10px;
+  }
+  .mission-track {
+    margin-top: 9px;
+  }
+  .quick {
+    top: 292px;
+    right: 12px;
+    left: 12px;
+    flex-direction: row;
+    gap: 6px;
+  }
+  .quick button {
+    flex: 1;
+    padding: 8px;
+    font-size: 11px;
+    min-height: 38px;
+  }
+  .radar {
+    display: none;
+  }
+  .status {
+    left: 12px;
+    bottom: 130px;
+    width: 205px;
+    padding: 12px 14px;
+  }
+  .status .eyebrow {
+    font-size: 7px;
+  }
+  .status strong {
+    font-size: 21px;
+  }
+  .status > div span,
+  .status label {
+    font-size: 10px;
+  }
+  .status small {
+    font-size: 9px;
+  }
+  #notice:not(:empty) {
+    top: 343px;
+    bottom: auto;
+    font-size: 11px;
+    padding: 8px 12px;
+    width: calc(100% - 24px);
+    max-width: none;
+  }
+  .interact {
+    bottom: 270px;
+    font-size: 12px;
+    padding: 12px 18px;
+  }
+  .npc-heading {
+    gap: 14px;
+    margin: 14px 0;
+  }
+  #npc-portrait {
+    width: 58px;
+    height: 64px;
+    border-radius: 10px;
+  }
+  .npc-heading h2 {
+    font-size: 27px;
+  }
+  .npc-details {
+    font-size: 10px;
+  }
+  .bubble {
+    font-size: 13px;
+    margin-right: 15px;
+  }
+  .bubble.user {
+    margin-left: 15px;
+  }
+  .chat-log {
+    height: 180px;
+  }
+  .chat-note {
+    font-size: 10px;
+  }
+}
+@media (max-height: 730px) and (min-width: 701px) {
+  .intro {
+    padding: 24px 30px;
+    transform: translateY(-40%);
+  }
+  .intro h1 {
+    font-size: 52px;
+    margin: 16px 0;
+  }
+  .features {
+    padding: 12px 0;
+    margin: 12px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button,
+  nav a {
+    transition: none;
+  }
+}
+#pause {
+  font-size: 0;
+}
+#pause::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 13px;
+  border-inline: 3px solid currentColor;
+}
+@media (max-width: 700px) {
+  .navigation-hud {
+    position: absolute;
+    top: 119px;
+    left: 12px;
+    right: 12px;
+    display: grid;
+    gap: 8px;
+  }
+  .navigation-hud .mission,
+  .navigation-hud .quick {
+    position: static;
+    width: auto;
+  }
+  #hud:has(.interact:not([hidden])) #notice {
+    visibility: hidden;
+  }
+  .send-row input {
+    font-size: 16px;
   }
 }
